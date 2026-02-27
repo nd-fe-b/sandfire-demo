@@ -618,17 +618,77 @@
   .sources-table .src-company { color: #b89edf; font-weight: 500; }
   .sources-table .src-type { font-weight: 500; color: #e0e0e0; }
   .sources-table .src-series { color: #b89edf; font-weight: 500; }
+
+  /* ===== MOBILE RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .demo-banner { font-size: 10px; padding: 5px 12px; }
+    .topbar { padding: 0 12px; height: 48px; }
+    .topbar .logo { margin-right: 16px; }
+    .topbar .logo img { height: 28px; }
+    .nav-tabs { gap: 16px; }
+    .nav-tabs a { font-size: 11px; }
+    .topbar .user .user-info { display: none; }
+    .topbar .user { gap: 8px; }
+    .main { height: calc(100vh - 48px); }
+
+    /* Landing */
+    .landing { gap: 24px; padding: 0 16px; }
+    .landing-slogan h1 { font-size: 20px; }
+    .landing-slogan .subtitle { font-size: 14px; }
+    .select-asset-wrapper { width: 100%; max-width: 520px; }
+    .recent-section { width: 100%; max-width: 520px; }
+
+    /* Chat */
+    .asset-banner { padding: 10px 12px; gap: 8px; }
+    .chat-area { padding: 0 12px; }
+    .msg { max-width: 100%; }
+    .chat-empty .empty-centered { padding: 0 12px; }
+    .chat-empty .empty-centered .input-wrapper { width: 100%; }
+    .input-bar { padding: 8px 0 12px; }
+    .input-wrapper { margin: 0 12px; padding: 12px 14px; min-height: 48px; }
+    .input-chips-right { display: none; }
+
+    /* History panel */
+    .history-panel { width: 260px; }
+
+    /* Data & Sources toolbars */
+    .data-toolbar { padding: 10px 12px; gap: 8px; }
+    .data-search { min-width: 120px; }
+    .data-cart-popover { width: 300px; }
+
+    /* Tables */
+    .data-table-wrap, .sources-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .data-table, .sources-table { min-width: 600px; }
+
+    /* Sources toolbar */
+    .sources-toolbar { padding: 10px 12px; gap: 8px; flex-wrap: wrap; }
+    .sources-search { min-width: 120px; }
+
+    /* Action bars */
+    .action-bar { flex-wrap: wrap; gap: 6px; }
+  }
+
+  @media (max-width: 480px) {
+    .topbar .logo { margin-right: 10px; }
+    .nav-tabs { gap: 12px; }
+    .nav-tabs a { font-size: 10px; }
+    .landing-slogan h1 { font-size: 18px; }
+    .select-asset-bar { padding: 12px 14px; font-size: 14px; }
+    .input-wrapper { border-radius: 14px; }
+    .data-filter-btn { padding: 6px 10px; font-size: 11px; }
+    .data-cart-btn { padding: 6px 10px; font-size: 11px; }
+  }
 </style>
 </head>
 <body>
-<div id="gate" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#1a1a2e;">
-  <form onsubmit="return unlock()" style="text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+<div id="gate" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#1a1a2e;padding:20px;">
+  <form onsubmit="return unlock()" style="text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;width:100%;max-width:400px;">
     <img src="assets/img/AR_brand_light.png" alt="AlfaRev" style="width:120px;margin-bottom:40px;opacity:0.9;">
-    <div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
       <input id="pw" type="password" placeholder="Enter password" autocomplete="off"
         style="font-size:16px;padding:12px 20px;border:1px solid rgba(255,255,255,0.2);border-radius:6px;background:rgba(255,255,255,0.05);color:#fff;outline:none;width:220px;font-family:inherit;">
       <button type="submit"
-        style="font-size:16px;padding:12px 24px;margin-left:8px;border:none;border-radius:6px;background:#6c49b6;color:#fff;cursor:pointer;font-family:inherit;">Open</button>
+        style="font-size:16px;padding:12px 24px;border:none;border-radius:6px;background:#6c49b6;color:#fff;cursor:pointer;font-family:inherit;">Open</button>
     </div>
     <p id="err" style="color:#e74c3c;margin-top:12px;font-size:13px;opacity:0;">&nbsp;</p>
   </form>
@@ -658,7 +718,7 @@ function unlock(){
     <a onclick="switchTab('SOURCES')">SOURCES</a>
   </div>
   <div class="user">
-    <div style="text-align: right">
+    <div class="user-info" style="text-align: right">
       <div style="color: #ccc; font-weight: 500;">John Doe</div>
       <div>Sandfire Resources</div>
     </div>
