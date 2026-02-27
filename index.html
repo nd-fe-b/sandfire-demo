@@ -696,7 +696,6 @@
 <script>
 function unlock(){
   if(document.getElementById('pw').value==='Perth'){
-    localStorage.setItem('unlocked','1');
     document.getElementById('gate').remove();
     document.getElementById('content').style.display='';
     return false;
@@ -1441,13 +1440,9 @@ function unlock(){
       </div>`;
     actionsBar.insertAdjacentElement('afterend', preview);
 
-    // Wire the link — open in new tab via hash params
+    // Wire the link — demo alert
     preview.querySelector('#apLink').onclick = () => {
-      preview.remove();
-      const hash = type === 'data'
-        ? '#tab=DATA&asset=' + encodeURIComponent(opts.asset || '') + '&series=' + encodeURIComponent((opts.series || []).join(','))
-        : '#tab=SOURCES&company=' + encodeURIComponent(opts.company || (opts.companies || []).join(',')) + '&types=' + encodeURIComponent((opts.types || []).join(','));
-      window.open(window.location.pathname + hash, '_blank');
+      alert(type === 'data' ? 'DEMO — Open Data' : 'DEMO — Open Sources');
     };
 
     // Close on mouse leave from the whole zone (actions + preview)
@@ -2349,40 +2344,6 @@ function unlock(){
     alert('DEMO - No Data Download');
   }
 
-  // ===== Auto-unlock from localStorage =====
-  if(localStorage.getItem('unlocked')==='1'){
-    var g=document.getElementById('gate'); if(g) g.remove();
-    document.getElementById('content').style.display='';
-  }
-
-  // ===== Hash-based deep linking (for new-tab opens) =====
-  (function() {
-    const hash = window.location.hash;
-    if (!hash) return;
-    const params = new URLSearchParams(hash.slice(1));
-    const tab = params.get('tab');
-    if (tab === 'DATA') {
-      const asset = params.get('asset');
-      const series = params.get('series');
-      setTimeout(() => {
-        const opts = {};
-        if (asset) opts.asset = asset;
-        if (series) opts.series = series.split(',');
-        openRelatedData(opts);
-      }, 100);
-    } else if (tab === 'SOURCES') {
-      const company = params.get('company');
-      const types = params.get('types');
-      setTimeout(() => {
-        const opts = {};
-        if (company) opts.company = company;
-        if (types) opts.types = types.split(',').filter(Boolean);
-        openRelatedSources(opts);
-      }, 100);
-    }
-    // Clean hash so it doesn't persist on refresh
-    history.replaceState(null, '', window.location.pathname);
-  })();
 </script>
 
 </div><!-- /content -->
