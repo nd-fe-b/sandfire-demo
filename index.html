@@ -28,7 +28,7 @@
     padding: 0 32px; border-bottom: 1px solid #3a3a3e; height: 56px;
   }
   .topbar .logo { display: flex; align-items: center; margin-right: 40px; }
-  .topbar .logo img { height: 40px; }
+  .topbar .logo img { height: 36px; }
   .nav-tabs {
     display: flex; gap: 28px; align-self: stretch; align-items: stretch;
   }
@@ -1213,9 +1213,17 @@
   function backToLanding() {
     currentAssets = [];
     currentChatId = null;
+    // Hide all views
     document.getElementById('chatView').classList.remove('active');
-    document.getElementById('landing').style.display = '';
+    document.getElementById('dataView')?.classList.remove('active');
+    document.getElementById('sourcesView')?.classList.remove('active');
     document.getElementById('historyPanel').classList.remove('open');
+    // Show landing and set nav to ASSET ANALYST
+    document.getElementById('landing').style.display = '';
+    document.querySelectorAll('.nav-tabs a').forEach(a => a.classList.remove('active'));
+    document.querySelectorAll('.nav-tabs a').forEach(a => {
+      if (a.textContent.trim() === 'ASSET ANALYST') a.classList.add('active');
+    });
   }
 
   // ===== History dropdown toggle =====
