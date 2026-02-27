@@ -1442,13 +1442,18 @@
     const assetCompanyMap = { 'Escondida': 'BHP Group', 'Olympic Dam': 'BHP Group', 'Spence': 'BHP Group', 'Chapada': 'Lundin Mining', 'Neves-Corvo': 'Lundin Mining', 'Caserones': 'Lundin Mining', 'Motheo': 'Sandfire Resources', 'Grasberg': 'Freeport-McMoRan', 'Kansanshi': 'First Quantum', 'Katanga': 'Glencore' };
     const company = assetCompanyMap[assetName] || 'BHP Group';
     const dataSeries = ['Ore Mined','Head Grade','C1 Cash Cost'];
-    const sourceTypes = ['Annual Report','Quarterly Report'];
+    // Pick top 2 source types by frequency for this company
+    const companyDocs = srcDocuments[company] || [];
+    const typeCounts = {};
+    companyDocs.forEach(d => { typeCounts[d.type] = (typeCounts[d.type] || 0) + 1; });
+    const sourceTypes = Object.entries(typeCounts).sort((a,b) => b[1] - a[1]).slice(0, 2).map(e => e[0]);
+    const sourceCount = companyDocs.filter(d => sourceTypes.includes(d.type)).length;
     html += `<div class="response-actions">
       <span class="response-action" onmouseenter="showActionPreview(event, 'data', {asset:'${assetName}', series:${JSON.stringify(dataSeries)}})">
         <span class="action-icon">&#8599;</span> Data <span class="action-count">${dataSeries.length}</span>
       </span>
       <span class="response-action" onmouseenter="showActionPreview(event, 'sources', {company:'${company}', types:${JSON.stringify(sourceTypes)}})">
-        <span class="action-icon">&#8599;</span> Sources <span class="action-count">${(srcDocuments[company] || []).filter(d => sourceTypes.includes(d.type)).length}</span>
+        <span class="action-icon">&#8599;</span> Sources <span class="action-count">${sourceCount}</span>
       </span>
     </div>`;
 
