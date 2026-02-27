@@ -60,6 +60,10 @@
     flex: 1; display: flex; flex-direction: column; position: relative;
     align-items: center; justify-content: center; gap: 32px; padding: 0 32px;
   }
+  .landing-slogan {
+    max-width: 480px; text-align: center; font-size: 16px;
+    color: #777; line-height: 1.5; letter-spacing: 0.1px;
+  }
   .select-asset-wrapper { position: relative; width: 520px; }
   .select-asset-bar {
     width: 100%; background: #1e1e22; border: 1px solid #4a4a4e;
@@ -662,6 +666,7 @@ function unlock(){
 
   <!-- ========== LANDING (all assets) ========== -->
   <div class="landing" id="landing">
+    <div class="landing-slogan">Ask me anything about an asset — I provide you with data and insight straight from the source.</div>
     <div class="select-asset-wrapper">
       <input class="select-asset-bar" id="assetSearch" type="text"
              placeholder="Select an asset"
