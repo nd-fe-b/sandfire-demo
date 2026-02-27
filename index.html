@@ -696,6 +696,7 @@
 <script>
 function unlock(){
   if(document.getElementById('pw').value==='Perth'){
+    sessionStorage.setItem('unlocked','1');
     document.getElementById('gate').remove();
     document.getElementById('content').style.display='';
     return false;
@@ -703,6 +704,10 @@ function unlock(){
   document.getElementById('err').style.opacity='1';
   document.getElementById('err').textContent='Incorrect password';
   return false;
+}
+if(sessionStorage.getItem('unlocked')==='1'){
+  document.getElementById('gate').remove();
+  document.getElementById('content').style.display='';
 }
 </script>
 <div id="content" style="display:none;">
