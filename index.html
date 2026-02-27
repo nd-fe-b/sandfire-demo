@@ -61,10 +61,14 @@
     align-items: center; justify-content: center; gap: 32px; padding: 0 32px;
   }
   .landing-slogan {
-    max-width: 480px; text-align: center; font-size: 16px;
-    color: #777; line-height: 1.6; letter-spacing: 0.1px;
+    max-width: 540px; text-align: center;
   }
-  .landing-slogan strong { color: #ccc; font-weight: 600; font-size: 18px; }
+  .landing-slogan h1 {
+    font-weight: 600; font-size: 24px; color: #ddd; line-height: 1.4; letter-spacing: 0.2px;
+  }
+  .landing-slogan .subtitle {
+    font-weight: 400; font-size: 15px; color: #777; margin-top: 8px; letter-spacing: 0.1px;
+  }
   .select-asset-wrapper { position: relative; width: 520px; }
   .select-asset-bar {
     width: 100%; background: #1e1e22; border: 1px solid #4a4a4e;
@@ -190,10 +194,10 @@
 
   /* New chat button */
   .new-chat-btn {
-    background: none; border: 1px solid #4a4a4e; color: #ccc;
-    border-radius: 6px; padding: 5px 12px; font-size: 12px; cursor: pointer;
+    background: #6c49b6; border: none; color: #fff;
+    border-radius: 6px; padding: 6px 14px; font-size: 12px; cursor: pointer; font-weight: 500;
   }
-  .new-chat-btn:hover { background: #35353a; color: #e0e0e0; }
+  .new-chat-btn:hover { background: #7d5bc9; }
 
   /* Chat messages */
   .chat-area {
@@ -667,7 +671,7 @@ function unlock(){
 
   <!-- ========== LANDING (all assets) ========== -->
   <div class="landing" id="landing">
-    <div class="landing-slogan"><strong>Mining analysis — straight from the source.</strong><br>Select an asset and ask me anything.</div>
+    <div class="landing-slogan"><h1>Mining analysis — straight from the source</h1><div class="subtitle">Select an asset and ask me anything</div></div>
     <div class="select-asset-wrapper">
       <input class="select-asset-bar" id="assetSearch" type="text"
              placeholder="Select an asset"
