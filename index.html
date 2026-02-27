@@ -705,10 +705,7 @@ function unlock(){
   document.getElementById('err').textContent='Incorrect password';
   return false;
 }
-if(localStorage.getItem('unlocked')==='1'){
-  document.getElementById('gate').remove();
-  document.getElementById('content').style.display='';
-}
+
 </script>
 <div id="content" style="display:none;">
 
@@ -2350,6 +2347,12 @@ if(localStorage.getItem('unlocked')==='1'){
 
   function downloadSrcSelected() {
     alert('DEMO - No Data Download');
+  }
+
+  // ===== Auto-unlock from localStorage =====
+  if(localStorage.getItem('unlocked')==='1'){
+    var g=document.getElementById('gate'); if(g) g.remove();
+    document.getElementById('content').style.display='';
   }
 
   // ===== Hash-based deep linking (for new-tab opens) =====
