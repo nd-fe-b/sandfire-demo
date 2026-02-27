@@ -1,0 +1,2249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlfaRev — Asset Analyst Wireframe</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #2a2a2e;
+    color: #e0e0e0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Demo banner (not part of the product) */
+  .demo-banner {
+    background: #1a1a1e; text-align: center; padding: 6px 16px;
+    font-size: 11px; color: #888; letter-spacing: 0.2px;
+    border-bottom: 1px solid #2a2a2e;
+  }
+  .demo-banner strong { color: #b89edf; font-weight: 600; }
+
+  /* Top bar (logo + nav + user in one row) */
+  .topbar {
+    display: flex; align-items: center;
+    padding: 0 32px; border-bottom: 1px solid #3a3a3e; height: 56px;
+  }
+  .topbar .logo { display: flex; align-items: center; margin-right: 40px; }
+  .topbar .logo img { height: 40px; }
+  .nav-tabs {
+    display: flex; gap: 28px; align-self: stretch; align-items: stretch;
+  }
+  .nav-tabs a {
+    display: flex; align-items: center;
+    text-decoration: none; color: #888; font-size: 13px;
+    font-weight: 500; cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .nav-tabs a:hover { color: #ccc; }
+  .nav-tabs a.active { color: #6c49b6; border-bottom-color: #6c49b6; }
+  .topbar .user {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 12px; font-size: 13px; color: #999;
+  }
+  .topbar .user .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    overflow: hidden; flex-shrink: 0;
+  }
+  .topbar .user .avatar img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+
+  /* Main */
+  .main { display: flex; flex-direction: column; height: calc(100vh - 56px); }
+
+  /* ===== LANDING STATE ===== */
+  .landing {
+    flex: 1; display: flex; flex-direction: column; position: relative;
+    align-items: center; justify-content: center; gap: 32px; padding: 0 32px;
+  }
+  .select-asset-wrapper { position: relative; width: 520px; }
+  .select-asset-bar {
+    width: 100%; background: #1e1e22; border: 1px solid #4a4a4e;
+    border-radius: 12px; padding: 16px 20px; font-size: 15px;
+    color: #e0e0e0; outline: none; cursor: text;
+  }
+  .select-asset-bar::placeholder { color: #666; }
+  .select-asset-bar:focus { border-color: #6c49b6; }
+  .search-results {
+    display: none; position: absolute; top: 100%; left: 0; right: 0;
+    margin-top: 4px; background: #35353a; border: 1px solid #4a4a4e;
+    border-radius: 10px; overflow: hidden; z-index: 100;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .search-results.open { display: block; }
+  .search-result-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 18px; cursor: pointer; border-bottom: 1px solid #3a3a3e; font-size: 14px;
+  }
+  .search-result-item:last-child { border-bottom: none; }
+  .search-result-item:hover { background: #3e3e44; }
+  .search-result-item .asset-name { color: #e0e0e0; font-weight: 500; }
+  .search-result-item .asset-company { color: #888; font-size: 12px; }
+
+  /* Recent chats on landing (all assets) */
+  .recent-section { width: 520px; }
+  .recent-section h3 {
+    font-size: 12px; font-weight: 500; color: #666;
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;
+  }
+  .recent-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 13px;
+  }
+  .recent-item:hover { background: #35353a; }
+  .recent-item .ri-title { flex: 1; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .recent-item .ri-asset { color: #888; font-size: 12px; white-space: nowrap; }
+  .recent-item .ri-time { color: #666; font-size: 11px; white-space: nowrap; }
+  .landing-copyright {
+    position: absolute; bottom: 6px; left: 0; right: 0; text-align: center;
+    font-size: 9px; color: #444; letter-spacing: 0.2px;
+  }
+
+  /* ===== ASSET CHAT VIEW ===== */
+  .chat-view { flex: 1; display: none; flex-direction: column; overflow: hidden; }
+  .chat-view.active { display: flex; }
+
+  /* Asset banner */
+  .asset-banner {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 32px; border-bottom: 1px solid #3a3a3e;
+  }
+  .asset-banner .change-btn {
+    background: none; border: none; color: #888; font-size: 18px;
+    cursor: pointer; padding: 4px 8px; border-radius: 6px;
+  }
+  .asset-banner .change-btn:hover { background: #35353a; color: #e0e0e0; }
+  .asset-banner .banner-right {
+    margin-left: auto; display: flex; align-items: center; gap: 10px;
+  }
+
+  /* Asset chip inside input (VS Code style) */
+  .input-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #6c49b618; border: 1px solid #6c49b644;
+    border-radius: 6px; padding: 3px 8px 3px 10px; font-size: 12px;
+    font-weight: 500; color: #b89edf; cursor: pointer;
+    white-space: nowrap; transition: border-color 0.15s ease;
+    flex-shrink: 0;
+  }
+  .input-chip:hover { border-color: #6c49b6aa; }
+  .input-chip .chip-remove {
+    background: none; border: none; color: #88888866; font-size: 13px;
+    cursor: pointer; padding: 0 1px; line-height: 1;
+  }
+  .input-chip .chip-remove:hover { color: #ccc; }
+  .input-chip-nav {
+    background: #ffffff08; border-color: #4a4a4e; color: #999; padding: 3px 8px;
+  }
+  .input-chip-nav:hover { border-color: #888; color: #ccc; }
+  .input-chip-nav .chip-arrow { color: #666; font-size: 10px; margin-left: 1px; }
+  .input-chip-nav:hover .chip-arrow { color: #aaa; }
+  .input-chips-right { margin-left: auto; display: flex; gap: 6px; flex-shrink: 0; }
+
+  /* History dropdown in banner */
+  .history-dropdown-wrapper { position: relative; }
+  .history-trigger {
+    display: flex; align-items: center; gap: 6px;
+    background: none; border: 1px solid #4a4a4e; border-radius: 6px;
+    padding: 5px 12px; cursor: pointer; font-size: 12px; color: #ccc;
+  }
+  .history-trigger:hover { background: #35353a; color: #e0e0e0; }
+  .history-trigger .chevron { font-size: 9px; color: #888; }
+  .history-panel {
+    display: none; position: absolute; top: 100%; right: 0;
+    margin-top: 4px; background: #35353a; border: 1px solid #4a4a4e;
+    border-radius: 10px; overflow: hidden; z-index: 100; width: 380px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .history-panel.open { display: block; }
+  .history-panel .hp-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; border-bottom: 1px solid #3a3a3e;
+  }
+  .history-panel .hp-header span {
+    font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .hp-new-btn {
+    background: #6c49b6; color: white; border: none; border-radius: 6px;
+    padding: 4px 12px; font-size: 11px; font-weight: 500; cursor: pointer;
+  }
+  .hp-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; cursor: pointer; font-size: 13px;
+    border-bottom: 1px solid #3a3a3e;
+  }
+  .hp-item:last-child { border-bottom: none; }
+  .hp-item:hover { background: #3e3e44; }
+  .hp-item.active { background: #6c49b612; }
+  .hp-item .hp-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #ccc; }
+  .hp-item .hp-time { font-size: 11px; color: #666; white-space: nowrap; }
+  .hp-empty { padding: 14px; color: #666; font-size: 13px; text-align: center; }
+
+  /* New chat button */
+  .new-chat-btn {
+    background: none; border: 1px solid #4a4a4e; color: #ccc;
+    border-radius: 6px; padding: 5px 12px; font-size: 12px; cursor: pointer;
+  }
+  .new-chat-btn:hover { background: #35353a; color: #e0e0e0; }
+
+  /* Chat messages */
+  .chat-area {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 0 32px;
+  }
+  .chat-messages {
+    flex: 1; overflow-y: auto; padding: 16px 0;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .msg { max-width: 620px; line-height: 1.6; font-size: 14px; }
+  .msg.user {
+    align-self: flex-end; background: #3e3e44; border: 1px solid #4a4a4e;
+    border-radius: 12px; padding: 12px 16px; color: #e0e0e0;
+  }
+  .msg.ai {
+    align-self: flex-start; background: #1e1e22; border: 1px solid #3a3a3e;
+    border-radius: 12px; padding: 16px 20px;
+  }
+  .msg.ai .timeline-entry { margin-bottom: 12px; }
+  .msg.ai .year { color: #6c49b6; font-weight: 600; }
+  .msg.ai .ref {
+    color: #6c49b6; font-weight: 700; font-size: 12px; cursor: pointer;
+    position: relative;
+  }
+  .msg.ai .ref:hover { text-decoration: underline; }
+
+  /* Source popover */
+  .ref-popover {
+    display: none; position: fixed; z-index: 300;
+    background: #2e2e33; border: 1px solid #4a4a4e; border-radius: 10px;
+    padding: 14px 16px; width: 360px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    font-weight: 400; font-size: 13px; line-height: 1.5;
+  }
+  .ref-popover.open { display: block; }
+  .ref-popover .ref-fragment {
+    color: #ccc; font-style: italic; margin-bottom: 10px;
+    border-left: 3px solid #6c49b6; padding-left: 10px;
+  }
+  .ref-popover .ref-source {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .ref-popover .ref-source-name { color: #888; font-size: 12px; }
+  .ref-popover .ref-source-link {
+    color: #6c49b6; font-size: 12px; text-decoration: none; font-weight: 500;
+  }
+  .ref-popover .ref-source-link:hover { text-decoration: underline; }
+
+  .msg.ai .followup {
+    margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid #3a3a3e; color: #999; font-size: 13px;
+  }
+
+  /* Response action bar — deep links to DATA / SOURCES */
+  .response-actions {
+    display: flex; gap: 8px; margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid #3a3a3e; flex-wrap: wrap;
+  }
+  .response-action {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(108,73,182,0.1); border: 1px solid rgba(108,73,182,0.3);
+    border-radius: 8px; padding: 6px 12px; font-size: 12px;
+    color: #b89edf; cursor: pointer; transition: all 0.15s;
+    text-decoration: none;
+  }
+  .response-action:hover {
+    background: rgba(108,73,182,0.2); border-color: rgba(108,73,182,0.5);
+    color: #d4c0f0;
+  }
+  .response-action .action-icon { font-size: 13px; }
+  .response-action .action-count {
+    background: rgba(108,73,182,0.3); border-radius: 6px;
+    padding: 1px 5px; font-size: 10px; font-weight: 700;
+  }
+  .response-action-wrap { position: relative; display: inline-flex; }
+
+  /* Inline preview for Data / Sources (inserted below response-actions on hover) */
+  .action-preview-inline {
+    margin-top: 8px; background: #232327; border: 1px solid #3a3a3e;
+    border-radius: 8px; overflow: hidden;
+  }
+  .action-preview-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px; border-bottom: 1px solid #3a3a3e;
+  }
+  .action-preview-header span { font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 0.3px; }
+  .action-preview-list { padding: 6px 0; max-height: 240px; overflow-y: auto; }
+  .action-preview-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 5px 14px; font-size: 12px; color: #ccc;
+  }
+  .action-preview-item:hover { background: rgba(108,73,182,0.08); }
+  .action-preview-item .ap-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .action-preview-item .ap-meta { color: #666; font-size: 10px; white-space: nowrap; margin-left: 8px; flex-shrink: 0; }
+  .action-preview-footer {
+    padding: 10px 14px; border-top: 1px solid #3a3a3e;
+  }
+  .action-preview-link {
+    display: block; text-align: center; background: rgba(108,73,182,0.15);
+    border: 1px solid rgba(108,73,182,0.3); border-radius: 6px;
+    padding: 7px; font-size: 12px; font-weight: 500; color: #b89edf;
+    cursor: pointer; text-decoration: none;
+  }
+  .action-preview-link:hover { background: rgba(108,73,182,0.25); color: #d4c0f0; }
+  .demo-badge {
+    display: inline-block; color: #666; font-size: 10px;
+    font-weight: 500; letter-spacing: 0.3px; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  /* Empty chat — centered input */
+  .chat-empty .empty-centered {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 0 32px;
+  }
+  .chat-empty .empty-centered .input-wrapper { width: 520px; }
+
+  /* Input bar */
+  .input-bar { padding: 16px 0 20px; }
+  .input-wrapper {
+    display: flex; align-items: center; gap: 8px; background: #1e1e22;
+    border: 1px solid #4a4a4e; border-radius: 12px; padding: 10px 16px;
+  }
+  .input-wrapper:focus-within { border-color: #6c49b6; }
+  .input-wrapper input {
+    flex: 1; background: none; border: none; outline: none;
+    color: #e0e0e0; font-size: 14px;
+  }
+  .input-wrapper input::placeholder { color: #666; }
+  .input-wrapper .send-btn {
+    background: none; border: none; color: #6c49b6;
+    font-size: 18px; cursor: pointer; padding: 0 4px;
+  }
+
+  /* ===== DATA TAB (CRM layout) ===== */
+  .data-view {
+    flex: 1; display: none; flex-direction: column; overflow: hidden;
+  }
+  .data-view.active { display: flex; }
+
+  /* Shared filter chip style (used by both DATA and SOURCES) */
+  .data-filter-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #6c49b618; border: 1px solid #6c49b644;
+    border-radius: 6px; padding: 2px 7px; font-size: 11px;
+    color: #b89edf; white-space: nowrap; flex-shrink: 0;
+  }
+  .data-filter-chip .chip-x {
+    font-size: 12px; color: #88888866; cursor: pointer;
+    margin-left: 2px; line-height: 1;
+  }
+  .data-filter-chip .chip-x:hover { color: #ccc; }
+
+  /* CRM-style toolbar */
+  .data-toolbar {
+    display: flex; align-items: center; gap: 10px; padding: 12px 24px;
+    border-bottom: 1px solid #3a3a3e; flex-wrap: wrap;
+  }
+  .data-filter-btn {
+    display: flex; align-items: center; gap: 4px;
+    background: #1e1e22; border: 1px solid #4a4a4e; border-radius: 8px;
+    padding: 7px 12px; font-size: 12px; color: #ccc; cursor: pointer;
+    position: relative; white-space: nowrap;
+  }
+  .data-filter-btn:hover { border-color: #6c49b6; }
+  .data-filter-btn.has-filter { border-color: #6c49b6; color: #b89edf; }
+  .data-filter-btn .arrow { font-size: 10px; color: #888; margin-left: 2px; }
+  .data-filter-dropdown {
+    display: none; position: absolute; top: 100%; left: 0; margin-top: 4px;
+    background: #35353a; border: 1px solid #4a4a4e; border-radius: 10px;
+    min-width: 220px; max-height: 280px; overflow-y: auto; z-index: 300;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4); padding: 6px 0;
+  }
+  .data-filter-dropdown.open { display: block; }
+  .data-filter-option {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px; cursor: pointer; font-size: 12px; color: #ccc;
+  }
+  .data-filter-option:hover { background: #3e3e44; }
+  .data-filter-option .opt-check {
+    width: 14px; height: 14px; border: 1px solid #5a5a5e; border-radius: 3px;
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  }
+  .data-filter-option.selected .opt-check {
+    background: #6c49b6; border-color: #6c49b6;
+  }
+  .data-filter-option.selected .opt-check::after {
+    content: '✓'; color: white; font-size: 10px; font-weight: 700;
+  }
+  .data-search {
+    flex: 1; min-width: 180px; background: #1e1e22; border: 1px solid #4a4a4e;
+    border-radius: 8px; padding: 7px 12px; font-size: 12px;
+    color: #e0e0e0; outline: none;
+  }
+  .data-search:focus { border-color: #6c49b6; }
+  .data-search::placeholder { color: #666; }
+  .data-cart-wrap { position: relative; margin-left: auto; }
+  .data-cart-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: #6c49b6; border: none; border-radius: 8px;
+    padding: 7px 14px; font-size: 12px; font-weight: 500;
+    color: white; cursor: pointer; white-space: nowrap;
+  }
+  .data-cart-btn:hover { background: #7c59c6; }
+  .data-cart-btn .cart-count {
+    background: white; color: #6c49b6; border-radius: 10px;
+    padding: 1px 6px; font-size: 11px; font-weight: 700;
+  }
+  .data-cart-popover {
+    display: none; position: absolute; top: 100%; right: 0; margin-top: 6px;
+    width: 400px; max-height: 480px; background: #2a2a2e; border: 1px solid #4a4a4e;
+    border-radius: 10px; box-shadow: 0 12px 32px rgba(0,0,0,0.5); z-index: 400;
+    flex-direction: column; overflow: hidden;
+  }
+  .data-cart-popover.open { display: flex; }
+  .data-cart-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-bottom: 1px solid #3a3a3e;
+  }
+  .data-cart-header h4 { margin: 0; font-size: 13px; color: #e0e0e0; font-weight: 600; }
+  .data-cart-clear {
+    background: none; border: none; color: #888; font-size: 11px;
+    cursor: pointer; padding: 2px 6px;
+  }
+  .data-cart-clear:hover { color: #e06060; }
+  .data-cart-body { overflow-y: auto; flex: 1; padding: 8px 0; }
+  .data-cart-empty { padding: 32px 16px; text-align: center; color: #666; font-size: 12px; }
+  .cart-asset-group { padding: 0 16px; margin-bottom: 8px; }
+  .cart-asset-label { font-size: 11px; color: #b89edf; font-weight: 600; padding: 4px 0 2px; }
+  .cart-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 0; font-size: 12px; color: #ccc;
+  }
+  .cart-item-info { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .cart-item-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cart-item-meta { color: #666; font-size: 10px; white-space: nowrap; }
+  .cart-item-remove {
+    background: none; border: none; color: #666; cursor: pointer;
+    font-size: 14px; padding: 0 2px; flex-shrink: 0;
+  }
+  .cart-item-remove:hover { color: #e06060; }
+  .data-cart-footer {
+    padding: 12px 16px; border-top: 1px solid #3a3a3e;
+    display: flex; gap: 8px;
+  }
+  .data-cart-download {
+    flex: 1; background: #6c49b6; border: none; border-radius: 8px;
+    padding: 8px; font-size: 12px; font-weight: 600; color: white; cursor: pointer;
+  }
+  .data-cart-download:hover { background: #7c59c6; }
+  .data-cart-download:disabled { background: #444; color: #666; cursor: default; }
+
+  /* Chip bar */
+  .data-chips {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    padding: 8px 24px; border-bottom: 1px solid #3a3a3e;
+  }
+  .data-chips:empty { display: none; }
+
+  /* Action bar */
+  .data-action-bar {
+    display: flex; align-items: center; gap: 8px; padding: 8px 24px;
+    border-bottom: 1px solid #3a3a3e;
+  }
+  .data-select-all {
+    flex-shrink: 0; background: none; border: 1px solid #4a4a4e; border-radius: 6px;
+    padding: 4px 10px; font-size: 11px; color: #999; cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .data-select-all:hover { border-color: #6c49b6; color: #ccc; }
+  .data-select-all.all-selected { border-color: #6c49b6; color: #b89edf; }
+  .data-series-count { margin-left: auto; font-size: 12px; color: #888; flex-shrink: 0; }
+
+  /* Table */
+  .data-table-wrap { flex: 1; overflow-y: auto; }
+  .data-table {
+    width: 100%; border-collapse: collapse; font-size: 12px;
+  }
+  .data-table th {
+    text-align: left; padding: 8px 12px; font-size: 11px; color: #666;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 1px solid #3a3a3e; position: sticky; top: 0;
+    background: #2a2a2e; font-weight: 500;
+  }
+  .data-table td {
+    padding: 10px 12px; border-bottom: 1px solid #3a3a3e22; color: #ccc;
+  }
+  .data-table tr:hover td { background: #35353a22; }
+  .data-table .dt-asset { color: #b89edf; font-weight: 500; }
+  .data-table .dt-company { color: #888; font-size: 11px; }
+  .data-table .dt-section .class-tag {
+    display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; letter-spacing: 0.3px;
+  }
+  .class-tag.tag-actual { background: rgba(108,73,182,0.2); color: #b89edf; }
+  .class-tag.tag-estimated { background: rgba(59,130,246,0.15); color: #7bb3f7; }
+  .class-tag.tag-ownership { background: rgba(234,179,8,0.15); color: #d4b44a; }
+  .data-table .dt-interval { color: #888; }
+  .data-table .dt-unit { color: #888; }
+  .data-table .dt-metal { color: #888; }
+
+  /* Toggle button (shared) */
+  .series-toggle {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid #4a4a4e; background: none;
+    cursor: pointer; flex-shrink: 0; padding: 0;
+    transition: all 0.15s ease; position: relative;
+  }
+  .series-toggle:hover { border-color: #6c49b6; }
+  .series-toggle.active {
+    border-color: #6c49b6; background: #6c49b6;
+  }
+  .series-toggle.active::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 8px; height: 8px; border-radius: 50%; background: white;
+  }
+
+  /* ===== SOURCES VIEW ===== */
+  .sources-view {
+    display: none; flex: 1; flex-direction: column; overflow: hidden;
+  }
+  .sources-view.active { display: flex; }
+
+  /* CRM-style top filter bar */
+  .sources-toolbar {
+    display: flex; align-items: center; gap: 10px; padding: 12px 24px;
+    border-bottom: 1px solid #3a3a3e; flex-wrap: wrap;
+  }
+  .sources-filter-btn {
+    display: flex; align-items: center; gap: 4px;
+    background: #1e1e22; border: 1px solid #4a4a4e; border-radius: 8px;
+    padding: 7px 12px; font-size: 12px; color: #ccc; cursor: pointer;
+    position: relative; white-space: nowrap;
+  }
+  .sources-filter-btn:hover { border-color: #6c49b6; }
+  .sources-filter-btn.has-filter { border-color: #6c49b6; color: #b89edf; }
+  .sources-filter-btn .arrow { font-size: 10px; color: #888; margin-left: 2px; }
+  .sources-filter-dropdown {
+    display: none; position: absolute; top: 100%; left: 0; margin-top: 4px;
+    background: #35353a; border: 1px solid #4a4a4e; border-radius: 10px;
+    min-width: 220px; max-height: 280px; overflow-y: auto; z-index: 300;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4); padding: 6px 0;
+  }
+  .sources-filter-dropdown.open { display: block; }
+  .sources-filter-option {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px; cursor: pointer; font-size: 12px; color: #ccc;
+  }
+  .sources-filter-option:hover { background: #3e3e44; }
+  .sources-filter-option .opt-check {
+    width: 14px; height: 14px; border: 1px solid #5a5a5e; border-radius: 3px;
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+  }
+  .sources-filter-option.selected .opt-check {
+    background: #6c49b6; border-color: #6c49b6;
+  }
+  .sources-filter-option.selected .opt-check::after {
+    content: '✓'; color: white; font-size: 10px; font-weight: 700;
+  }
+  .sources-search {
+    flex: 1; min-width: 180px; background: #1e1e22; border: 1px solid #4a4a4e;
+    border-radius: 8px; padding: 7px 12px; font-size: 12px;
+    color: #e0e0e0; outline: none;
+  }
+  .sources-search:focus { border-color: #6c49b6; }
+  .sources-search::placeholder { color: #666; }
+  .sources-download-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: #6c49b6; border: none; border-radius: 8px;
+    padding: 7px 14px; font-size: 12px; font-weight: 500;
+    color: white; cursor: pointer; white-space: nowrap;
+  }
+  .sources-download-btn:hover { background: #7c59c6; }
+  .sources-download-btn .dl-count {
+    background: white; color: #6c49b6; border-radius: 10px;
+    padding: 1px 6px; font-size: 11px; font-weight: 700;
+  }
+
+  /* Chip bar (below toolbar) */
+  .sources-chips {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    padding: 8px 24px; border-bottom: 1px solid #3a3a3e;
+  }
+  .sources-chips:empty { display: none; }
+
+  /* Action bar (select all + count) */
+  .sources-action-bar {
+    display: flex; align-items: center; gap: 8px; padding: 8px 24px;
+    border-bottom: 1px solid #3a3a3e;
+  }
+  .sources-select-all {
+    flex-shrink: 0; background: none; border: 1px solid #4a4a4e; border-radius: 6px;
+    padding: 4px 10px; font-size: 11px; color: #999; cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .sources-select-all:hover { border-color: #6c49b6; color: #ccc; }
+  .sources-select-all.all-selected { border-color: #6c49b6; color: #b89edf; }
+  .sources-doc-count { margin-left: auto; font-size: 12px; color: #888; flex-shrink: 0; }
+
+  .sources-table-wrap { flex: 1; overflow-y: auto; }
+  .sources-table {
+    width: 100%; border-collapse: collapse; font-size: 12px;
+  }
+  .sources-table th {
+    text-align: left; padding: 8px 12px; font-size: 11px; color: #666;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 1px solid #3a3a3e; position: sticky; top: 0;
+    background: #2a2a2e; font-weight: 500;
+  }
+  .sources-table td {
+    padding: 10px 12px; border-bottom: 1px solid #3a3a3e22; color: #ccc;
+  }
+  .sources-table tr:hover td { background: #35353a22; }
+  .sources-table .src-company { color: #b89edf; font-weight: 500; }
+  .sources-table .src-type { font-weight: 500; color: #e0e0e0; }
+  .sources-table .src-series { color: #b89edf; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="demo-banner"><strong>Interactive Demo</strong> — Sample data shown for illustration purposes. Not connected to live systems.</div>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="logo" onclick="backToLanding()" style="cursor: pointer;"><img src="assets/img/AR_fox_light.png" alt="AlfaRev"></div>
+  <div class="nav-tabs">
+    <a class="active" onclick="switchTab('ASSET ANALYST')">ASSET ANALYST</a>
+    <a onclick="switchTab('DATA')">DATA</a>
+    <a onclick="switchTab('SOURCES')">SOURCES</a>
+  </div>
+  <div class="user">
+    <div style="text-align: right">
+      <div style="color: #ccc; font-weight: 500;">Adrian Hartojo</div>
+      <div>Sandfire Resources</div>
+    </div>
+    <div class="avatar"><img src="assets/img/avatar.jpeg" alt="AH"></div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- ========== LANDING (all assets) ========== -->
+  <div class="landing" id="landing">
+    <div class="select-asset-wrapper">
+      <input class="select-asset-bar" id="assetSearch" type="text"
+             placeholder="Select an asset"
+             oninput="onSearch(this.value)"
+             onfocus="onSearch(this.value)">
+      <div class="search-results" id="searchResults">
+        <div class="search-result-item" onclick="openAsset('Escondida', 'BHP Group')">
+          <div>
+            <div class="asset-name">Escondida</div>
+            <div class="asset-company">BHP Group &middot; Chile &middot; Open Pit</div>
+          </div>
+        </div>
+        <div class="search-result-item" onclick="openAsset('Chapada', 'Lundin Mining')">
+          <div>
+            <div class="asset-name">Chapada</div>
+            <div class="asset-company">Lundin Mining &middot; Brazil &middot; Open Pit</div>
+          </div>
+        </div>
+        <div class="search-result-item" onclick="openAsset('Neves-Corvo', 'Lundin Mining')">
+          <div>
+            <div class="asset-name">Neves-Corvo</div>
+            <div class="asset-company">Lundin Mining &middot; Portugal &middot; Underground</div>
+          </div>
+        </div>
+        <div class="search-result-item" onclick="openAsset('Motheo', 'Sandfire Resources')">
+          <div>
+            <div class="asset-name">Motheo</div>
+            <div class="asset-company">Sandfire Resources &middot; Botswana &middot; Open Pit</div>
+          </div>
+        </div>
+        <div class="search-result-item" onclick="openAsset('Grasberg', 'Freeport-McMoRan')">
+          <div>
+            <div class="asset-name">Grasberg</div>
+            <div class="asset-company">Freeport-McMoRan &middot; Indonesia &middot; Underground</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="recent-section">
+      <h3>Recent</h3>
+      <div class="recent-item" onclick="openChatFromLanding('escondida-1')">
+        <div class="ri-title">Escondida production impacts over 5 years</div>
+        <div class="ri-asset">Escondida</div>
+        <div class="ri-time">2h ago</div>
+      </div>
+      <div class="recent-item" onclick="openChatFromLanding('escondida-2')">
+        <div class="ri-title">Grade decline and recovery rate correlation</div>
+        <div class="ri-asset">Escondida</div>
+        <div class="ri-time">Yesterday</div>
+      </div>
+      <div class="recent-item" onclick="openChatFromLanding('chapada-1')">
+        <div class="ri-title">Chapada C1 cost spike analysis</div>
+        <div class="ri-asset">Chapada</div>
+        <div class="ri-time">Feb 25</div>
+      </div>
+      <div class="recent-item" onclick="openChatFromLanding('chapada-2')">
+        <div class="ri-title">Chapada electricity cost breakdown</div>
+        <div class="ri-asset">Chapada</div>
+        <div class="ri-time">Feb 20</div>
+      </div>
+    </div>
+    <div class="landing-copyright">&copy; AlfaRev 2026</div>
+  </div>
+
+  <!-- ========== ASSET CHAT VIEW ========== -->
+  <div class="chat-view" id="chatView">
+
+    <!-- Asset banner -->
+    <div class="asset-banner">
+      <button class="change-btn" onclick="backToLanding()" title="Change asset">&#8592;</button>
+      <div class="banner-right">
+        <div class="history-dropdown-wrapper">
+          <button class="history-trigger" onclick="toggleHistory()">
+            <span id="activeChatTitle">History</span>
+            <span class="chevron">&#9662;</span>
+          </button>
+          <div class="history-panel" id="historyPanel"></div>
+        </div>
+        <button class="new-chat-btn" onclick="newChatSameAsset()">+ New</button>
+      </div>
+    </div>
+
+    <!-- Chat: empty (new conversation) -->
+    <div class="chat-area chat-empty" id="chat-new">
+      <div class="empty-centered" id="newChatEmpty">
+        <div class="input-wrapper">
+          <span class="input-chips"></span>
+          <input type="text" id="newChatInput" placeholder="Ask a question..."
+                 onkeydown="if(event.key==='Enter')sendDemo()">
+          <span class="input-chips-right"></span>
+          <button class="send-btn" onclick="sendDemo()">&#8593;</button>
+        </div>
+      </div>
+      <div class="chat-messages" id="newChatMessages" style="display:none;"></div>
+      <div class="input-bar" id="newChatInputBar" style="display:none;">
+        <div class="input-wrapper">
+          <span class="input-chips"></span>
+          <input type="text" id="newChatInputBottom" placeholder="Ask a question..."
+                 onkeydown="if(event.key==='Enter')sendDemo()">
+          <span class="input-chips-right"></span>
+          <button class="send-btn" onclick="sendDemo()">&#8593;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat: Escondida production timeline -->
+    <div class="chat-area" id="chat-escondida-1" style="display:none;">
+      <div class="chat-messages">
+        <div class="msg user">
+          What impacted copper production at Escondida over the last 5 years?
+        </div>
+        <div class="msg ai">
+          <div class="demo-badge">Demo response</div>
+          <div class="timeline-entry">
+            <span class="year">2020:</span> Concentrator throughput reduced 12% due to COVID protocols limiting crew rotations. <span class="ref" data-fragment="Operations at Escondida were impacted by COVID-19 restrictions, with concentrator throughput reduced by approximately 12% due to crew rotation limitations and social distancing protocols." data-source="BHP Annual Report 2020, p.87" onclick="showRef(event)">1</span>
+          </div>
+          <div class="timeline-entry">
+            <span class="year">2021:</span> Laguna Seca concentrator offline 18 days — planned SAG motor replacement. Output down ~15 kt for the quarter. <span class="ref" data-fragment="The Laguna Seca concentrator was taken offline for 18 days during Q3 for a planned SAG mill motor replacement, resulting in an estimated 15 kt reduction in copper production for the quarter." data-source="BHP Operational Review Q3 2021, p.4" onclick="showRef(event)">2</span>
+          </div>
+          <div class="timeline-entry">
+            <span class="year">2022:</span> Record throughput at 82 Mtpa, but head grade fell below 0.85% for the first time. Net production flat. <span class="ref" data-fragment="Combined concentrator throughput reached a record 82 Mtpa, however declining ore grades partially offset the throughput gains." data-source="BHP Annual Report 2022, p.112" onclick="showRef(event)">3</span> <span class="ref" data-fragment="Average head grade for the year was 0.84% Cu, the first time annual grade has fallen below 0.85% since operations began." data-source="BHP Annual Report 2022, p.114" onclick="showRef(event)">4</span>
+          </div>
+          <div class="timeline-entry">
+            <span class="year">2023:</span> Escondida Norte stockpile processing ended. Blended grade dropped to 0.76%. <span class="ref" data-fragment="Processing of residual stockpiles from the Escondida Norte open pit was completed during the period. Blended feed grade declined to 0.76% Cu." data-source="BHP Annual Report 2023, p.98" onclick="showRef(event)">5</span>
+          </div>
+          <div class="timeline-entry">
+            <span class="year">2024:</span> OGP1 water supply project commissioned — removed desalination bottleneck that had constrained throughput since 2019. <span class="ref" data-fragment="The OGP1 water supply project was successfully commissioned in H1 2024, providing an additional 1,400 litres per second of desalinated water to support concentrator operations." data-source="BHP Operational Review Q2 2024, p.6" onclick="showRef(event)">6</span> <span class="ref" data-fragment="Water availability had been the primary constraint on concentrator throughput since 2019. With OGP1 online, both Los Colorados and Laguna Seca can now operate at design capacity." data-source="BHP Annual Report 2024, p.105" onclick="showRef(event)">7</span>
+          </div>
+          <div class="followup">Do you want me to export this timeline as a csv?</div>
+          <div class="response-actions">
+            <span class="response-action" onmouseenter="showActionPreview(event, 'data', {asset:'Escondida', series:['Ore Mined','Ore Milled','Contained Metal','Recovery Rate','Head Grade']})">
+              <span class="action-icon">&#8599;</span> Data <span class="action-count">5</span>
+            </span>
+            <span class="response-action" onmouseenter="showActionPreview(event, 'sources', {company:'BHP Group', types:['Annual Report','Operational Review']})">
+              <span class="action-icon">&#8599;</span> Sources <span class="action-count">4</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="input-bar">
+        <div class="input-wrapper">
+          <span class="input-chips"></span>
+          <input type="text" placeholder="Ask a question..."
+                 onkeydown="if(event.key==='Enter')sendFollowup(this)">
+          <span class="input-chips-right"></span>
+          <button class="send-btn" onclick="sendFollowup(this.closest('.input-wrapper').querySelector('input'))">&#8593;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat: Escondida grade decline -->
+    <div class="chat-area" id="chat-escondida-2" style="display:none;">
+      <div class="chat-messages">
+        <div class="msg user">
+          What's the relationship between grade decline and recovery rates?
+        </div>
+        <div class="msg ai">
+          <div class="demo-badge">Demo response</div>
+          <div style="margin-bottom: 14px;">
+            Strong linear correlation at Escondida — each 0.1% drop in head grade reduces flotation recovery by ~1.2%.
+          </div>
+          <div class="timeline-entry">
+            <span class="year">Mechanism:</span> Lower Cu grades mean less chalcopyrite per tonne. Flotation circuits lose selectivity as the mineral fraction shrinks relative to gangue. <span class="ref" data-fragment="As head grades decline, the proportion of copper-bearing minerals (primarily chalcopyrite) decreases relative to gangue, reducing flotation selectivity and overall recovery." data-source="Escondida Technical Report NI 43-101, 2022, p.156" onclick="showRef(event)">1</span>
+          </div>
+          <div class="timeline-entry">
+            <span class="year">Data:</span> Grade fell from 0.96% to 0.72% (2018–2024). Recovery dropped from 88.1% to 85.2% over the same period — almost exactly the predicted 1.2%/0.1% relationship. <span class="ref" data-fragment="Head grade averaged 0.96% Cu in 2018, declining to 0.72% by 2024 as mining progressed into lower-grade zones." data-source="BHP Annual Report 2024, p.108" onclick="showRef(event)">2</span> <span class="ref" data-fragment="Flotation recovery declined from 88.1% to 85.2% over the 2018–2024 period, consistent with metallurgical models predicting approximately 1.2% recovery loss per 0.1% grade reduction." data-source="BHP Annual Report 2024, p.110" onclick="showRef(event)">3</span>
+          </div>
+          <div class="timeline-entry">
+            <span class="year">Mitigation:</span> BHP invested in coarser flotation technology (2023) and reagent optimization, partly offsetting the mechanical recovery loss. <span class="ref" data-fragment="A coarser flotation circuit was trialled during 2023 and has been adopted as standard operating practice. Combined with reagent optimisation, these measures recovered approximately 0.4% of the grade-driven recovery loss." data-source="BHP Operational Review Q4 2023, p.8" onclick="showRef(event)">4</span>
+          </div>
+          <div class="followup">Do you want me to plot grade vs recovery over the full time series?</div>
+          <div class="response-actions">
+            <span class="response-action" onmouseenter="showActionPreview(event, 'data', {asset:'Escondida', series:['Head Grade','Recovery Rate']})">
+              <span class="action-icon">&#8599;</span> Data <span class="action-count">2</span>
+            </span>
+            <span class="response-action" onmouseenter="showActionPreview(event, 'sources', {company:'BHP Group', types:['Annual Report','Technical Report']})">
+              <span class="action-icon">&#8599;</span> Sources <span class="action-count">3</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="input-bar">
+        <div class="input-wrapper">
+          <span class="input-chips"></span>
+          <input type="text" placeholder="Ask a question..."
+                 onkeydown="if(event.key==='Enter')sendFollowup(this)">
+          <span class="input-chips-right"></span>
+          <button class="send-btn" onclick="sendFollowup(this.closest('.input-wrapper').querySelector('input'))">&#8593;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat: Chapada C1 WHY -->
+    <div class="chat-area" id="chat-chapada-1" style="display:none;">
+      <div class="chat-messages">
+        <div class="msg user">
+          Why did C1 spike at Chapada in 2023?
+        </div>
+        <div class="msg ai">
+          <div class="demo-badge">Demo response</div>
+          <div style="margin-bottom: 14px;">
+            C1 rose from $1.61/lb to $2.14/lb (+33%) — driven by three compounding factors:
+          </div>
+          <div class="timeline-entry">
+            <span class="year">Mill downtime:</span> SAG mill reline extended to 23 days (planned 12) after discovering additional wear on the discharge grate. Fixed costs spread over ~1.2 Mt less throughput. <span class="ref" data-fragment="The Q2 2023 SAG mill reline was extended from the planned 12 days to 23 days following discovery of additional wear on the discharge grate. This resulted in approximately 1.2 Mt of lost throughput." data-source="Lundin Mining Q2 2023 MD&A, p.12" onclick="showRef(event)">1</span>
+          </div>
+          <div class="timeline-entry">
+            <span class="year">Lower by-product credits:</span> Ore blend shifted to transitional material with lower gold association. Gold recovery dropped from 68% to 54%, reducing credits by $0.13/lb Cu. <span class="ref" data-fragment="Ore feed during 2023 included a higher proportion of transitional material with lower gold association. Gold recovery declined from 68% to 54%." data-source="Lundin Mining Annual Report 2023, p.34" onclick="showRef(event)">2</span> <span class="ref" data-fragment="The reduction in gold by-product credits amounted to $0.13/lb Cu on a full-year basis, primarily driven by lower gold recoveries from the transitional ore blend." data-source="Lundin Mining Annual Report 2023, p.36" onclick="showRef(event)">3</span>
+          </div>
+          <div class="timeline-entry">
+            <span class="year">Input cost inflation:</span> Brazilian diesel +22% YoY, grinding media +18%. Combined ~$0.12/lb impact. <span class="ref" data-fragment="Key input costs increased materially in 2023: Brazilian diesel prices rose 22% year-over-year and grinding media costs increased 18%, contributing a combined approximately US$0.12/lb to C1 cash costs." data-source="Lundin Mining Annual Report 2023, p.38" onclick="showRef(event)">4</span>
+          </div>
+          <div style="margin-top: 12px;">
+            2024 recovered to $1.87/lb — throughput normalized and gold recovery back to 62%. Lundin guides $1.75–1.85/lb for 2025. <span class="ref" data-fragment="C1 cash costs recovered to $1.87/lb in 2024 as throughput normalized and gold recovery improved to 62%. Management guidance for 2025 is $1.75–1.85/lb." data-source="Lundin Mining Q4 2024 Results, p.7" onclick="showRef(event)">5</span>
+          </div>
+          <div class="followup">Do you want me to compare Chapada's C1 trend against Caserones and Neves-Corvo?</div>
+          <div class="response-actions">
+            <span class="response-action" onmouseenter="showActionPreview(event, 'data', {asset:'Chapada', series:['C1 Cash Cost','AISC','By-Product Credits','Revenue']})">
+              <span class="action-icon">&#8599;</span> Data <span class="action-count">4</span>
+            </span>
+            <span class="response-action" onmouseenter="showActionPreview(event, 'sources', {company:'Lundin Mining', types:['Annual Report','Quarterly Report']})">
+              <span class="action-icon">&#8599;</span> Sources <span class="action-count">3</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="input-bar">
+        <div class="input-wrapper">
+          <span class="input-chips"></span>
+          <input type="text" placeholder="Ask a question..."
+                 onkeydown="if(event.key==='Enter')sendFollowup(this)">
+          <span class="input-chips-right"></span>
+          <button class="send-btn" onclick="sendFollowup(this.closest('.input-wrapper').querySelector('input'))">&#8593;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat: Chapada electricity -->
+    <div class="chat-area" id="chat-chapada-2" style="display:none;">
+      <div class="chat-messages">
+        <div class="msg user">
+          Break down electricity costs at Chapada.
+        </div>
+        <div class="msg ai">
+          <div class="demo-badge">Demo response</div>
+          <div style="margin-bottom: 14px;">
+            Electricity is Chapada's largest single cost line — US$52/t milled in 2024, up 37% since 2021.
+          </div>
+          <div class="timeline-entry">
+            <span class="year">Tariffs:</span> ANEEL regulated tariff increases + drought reducing hydro generation. Spot market exposure during dry season. <span class="ref" data-fragment="ANEEL-regulated tariffs increased 14% in 2024. Reduced hydroelectric generation due to drought conditions increased reliance on higher-cost thermal generation, with Chapada exposed to spot market pricing during the May–September dry season." data-source="Lundin Mining Annual Report 2024, p.42" onclick="showRef(event)">1</span>
+          </div>
+          <div class="timeline-entry">
+            <span class="year">Ore hardness:</span> Bond Work Index up from 13.2 to 15.8 kWh/t as mining advances into deeper Corpo Sul zones. <span class="ref" data-fragment="Bond Work Index has increased from 13.2 kWh/t to 15.8 kWh/t as mining has progressed into the deeper Corpo Sul zones, directly increasing grinding energy consumption per tonne milled." data-source="Lundin Mining Technical Report 2023, p.89" onclick="showRef(event)">2</span>
+          </div>
+          <div class="timeline-entry">
+            <span class="year">Peer context:</span> Chapada at $52/t vs peer median $41/t. Gap is structural (Brazil grid + harder ore), not operational. <span class="ref" data-fragment="Chapada's electricity cost of US$52/t milled compares to a peer median of US$41/t for similar-scale copper operations globally." data-source="Wood Mackenzie Copper Cost Curves 2024, p.23" onclick="showRef(event)">3</span> <span class="ref" data-fragment="The electricity cost premium at Chapada is primarily structural, driven by Brazil's grid tariff structure and increasing ore hardness, rather than operational inefficiency." data-source="Lundin Mining Investor Day Presentation 2024, slide 34" onclick="showRef(event)">4</span>
+          </div>
+          <div class="followup">Do you want me to pull Lundin's energy hedging disclosures?</div>
+          <div class="response-actions">
+            <span class="response-action" onmouseenter="showActionPreview(event, 'data', {asset:'Chapada', series:['C1 Cash Cost','AISC']})">
+              <span class="action-icon">&#8599;</span> Data <span class="action-count">2</span>
+            </span>
+            <span class="response-action" onmouseenter="showActionPreview(event, 'sources', {company:'Lundin Mining', types:['Annual Report','Technical Report','Investor Presentation']})">
+              <span class="action-icon">&#8599;</span> Sources <span class="action-count">4</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="input-bar">
+        <div class="input-wrapper">
+          <span class="input-chips"></span>
+          <input type="text" placeholder="Ask a question..."
+                 onkeydown="if(event.key==='Enter')sendFollowup(this)">
+          <span class="input-chips-right"></span>
+          <button class="send-btn" onclick="sendFollowup(this.closest('.input-wrapper').querySelector('input'))">&#8593;</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /chat-view -->
+
+  <!-- ========== DATA VIEW ========== -->
+  <div class="data-view" id="dataView">
+    <!-- CRM-style toolbar -->
+    <div class="data-toolbar">
+      <div style="position:relative;" id="dataCompanyFilterWrap">
+        <button class="data-filter-btn" id="dataCompanyBtn" onclick="toggleDataDropdown('company')">
+          Company <span class="arrow">&#9662;</span>
+        </button>
+        <div class="data-filter-dropdown" id="dataCompanyDropdown"></div>
+      </div>
+      <div style="position:relative;" id="dataAssetFilterWrap">
+        <button class="data-filter-btn" id="dataAssetBtn" onclick="toggleDataDropdown('asset')">
+          Asset <span class="arrow">&#9662;</span>
+        </button>
+        <div class="data-filter-dropdown" id="dataAssetDropdown"></div>
+      </div>
+      <div style="position:relative;" id="dataMetalFilterWrap">
+        <button class="data-filter-btn" id="dataMetalBtn" onclick="toggleDataDropdown('metal')">
+          Metal <span class="arrow">&#9662;</span>
+        </button>
+        <div class="data-filter-dropdown" id="dataMetalDropdown"></div>
+      </div>
+      <input class="data-search" type="text" placeholder="Search time series..."
+             id="dataSearch" oninput="renderDataTable()">
+      <div class="data-cart-wrap" id="dataCartWrap">
+        <button class="data-cart-btn" onclick="toggleDataCart()">
+          Data Cart <span class="cart-count" id="dataCartCount">0</span>
+        </button>
+        <div class="data-cart-popover" id="dataCartPopover">
+          <div class="data-cart-header">
+            <h4>Data Cart</h4>
+            <button class="data-cart-clear" onclick="clearDataCart()">Clear all</button>
+          </div>
+          <div class="data-cart-body" id="dataCartBody"></div>
+          <div class="data-cart-footer">
+            <button class="data-cart-download" id="dataCartDownloadBtn" onclick="downloadDataCart()">
+              Download
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Active filter chips -->
+    <div class="data-chips" id="dataChips"></div>
+    <!-- Action bar -->
+    <div class="data-action-bar">
+      <button class="data-select-all" id="selectAllBtn" onclick="toggleSelectAll()">Select All</button>
+      <span class="data-series-count" id="seriesCount"></span>
+    </div>
+    <!-- Table -->
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Asset</th>
+            <th>Company</th>
+            <th>Series</th>
+            <th>Timeseries Class</th>
+            <th>Unit</th>
+            <th>Metal</th>
+            <th>Int.</th>
+            <th style="width:36px;"></th>
+          </tr>
+        </thead>
+        <tbody id="dataTableBody"></tbody>
+      </table>
+    </div>
+  </div><!-- /data-view -->
+
+  <!-- ========== SOURCES VIEW ========== -->
+  <div class="sources-view" id="sourcesView">
+    <!-- CRM-style toolbar -->
+    <div class="sources-toolbar">
+      <div style="position:relative;" id="srcCompanyFilterWrap">
+        <button class="sources-filter-btn" id="srcCompanyBtn" onclick="toggleSrcDropdown('company')">
+          Company <span class="arrow">&#9662;</span>
+        </button>
+        <div class="sources-filter-dropdown" id="srcCompanyDropdown"></div>
+      </div>
+      <div style="position:relative;" id="srcTypeFilterWrap">
+        <button class="sources-filter-btn" id="srcTypeBtn" onclick="toggleSrcDropdown('type')">
+          Source Type <span class="arrow">&#9662;</span>
+        </button>
+        <div class="sources-filter-dropdown" id="srcTypeDropdown"></div>
+      </div>
+      <input class="sources-search" type="text" placeholder="Search documents..."
+             id="srcSearch" oninput="renderSrcTable()">
+      <button class="sources-download-btn" onclick="downloadSrcSelected()">
+        Download Selected <span class="dl-count" id="srcDlCount">0</span>
+      </button>
+    </div>
+    <!-- Active filter chips -->
+    <div class="sources-chips" id="srcChips"></div>
+    <!-- Action bar -->
+    <div class="sources-action-bar">
+      <button class="sources-select-all" id="srcSelectAllBtn" onclick="toggleSrcSelectAll()">Select All</button>
+      <span class="sources-doc-count" id="srcDocCount"></span>
+    </div>
+    <!-- Table -->
+    <div class="sources-table-wrap">
+      <table class="sources-table">
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Title</th>
+            <th>Report Type</th>
+            <th>Publication Date</th>
+            <th>Available Since</th>
+            <th># Series</th>
+            <th style="width:36px;"></th>
+          </tr>
+        </thead>
+        <tbody id="srcTableBody"></tbody>
+      </table>
+    </div>
+  </div><!-- /sources-view -->
+
+</div><!-- /main -->
+
+<!-- Source popover (one shared, positioned dynamically) -->
+<div class="ref-popover" id="refPopover">
+  <div class="ref-fragment" id="refFragment"></div>
+  <div class="ref-source">
+    <span class="ref-source-name" id="refSourceName"></span>
+    <span class="ref-source-link" id="refSourceLink" style="cursor:pointer;">Open source &#8599;</span>
+  </div>
+</div>
+
+<script>
+  // All chat history — keyed by asset
+  const allChats = {
+    'Escondida': [
+      { id: 'escondida-1', title: 'Escondida production impacts over 5 years', time: '2h ago' },
+      { id: 'escondida-2', title: 'Grade decline and recovery rate correlation', time: 'Yesterday' },
+    ],
+    'Chapada': [
+      { id: 'chapada-1', title: 'Chapada C1 cost spike analysis', time: 'Feb 25' },
+      { id: 'chapada-2', title: 'Chapada electricity cost breakdown', time: 'Feb 20' },
+    ],
+  };
+
+  const assetCompanies = {
+    'Escondida': 'BHP Group',
+    'Chapada': 'Lundin Mining',
+    'Neves-Corvo': 'Lundin Mining',
+    'Motheo': 'Sandfire Resources',
+    'Grasberg': 'Freeport-McMoRan',
+  };
+
+  let currentAssets = [];  // array of asset names
+  let currentChatId = null;
+
+  // ===== Render chips (inside all input fields, VS Code style) =====
+  function renderChips() {
+    const assetChips = currentAssets.map(a => {
+      const removeBtn = currentAssets.length > 1
+        ? `<button class="chip-remove" onclick="event.stopPropagation();removeAsset('${a}')">&times;</button>` : '';
+      return `<span class="input-chip" onclick="openDataTab('${a}')" title="View ${a} data">${a}${removeBtn}</span>`;
+    }).join('');
+    document.querySelectorAll('.input-chips').forEach(el => { el.innerHTML = assetChips; });
+    document.querySelectorAll('.input-chips-right').forEach(el => {
+      el.innerHTML = '';
+    });
+  }
+
+  function removeAsset(name) {
+    currentAssets = currentAssets.filter(a => a !== name);
+    if (currentAssets.length === 0) { backToLanding(); return; }
+    renderChips();
+    buildHistoryDropdown();
+  }
+
+  // ===== Search =====
+  function onSearch(val) {
+    const results = document.getElementById('searchResults');
+    if (val.length > 0 || document.activeElement === document.getElementById('assetSearch')) {
+      results.classList.add('open');
+    } else {
+      results.classList.remove('open');
+    }
+    const items = results.querySelectorAll('.search-result-item');
+    items.forEach(item => {
+      const name = item.querySelector('.asset-name').textContent.toLowerCase();
+      const company = item.querySelector('.asset-company').textContent.toLowerCase();
+      item.style.display = (name.includes(val.toLowerCase()) || company.includes(val.toLowerCase())) ? '' : 'none';
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.select-asset-wrapper'))
+      document.getElementById('searchResults').classList.remove('open');
+    if (!e.target.closest('.history-dropdown-wrapper'))
+      document.getElementById('historyPanel').classList.remove('open');
+    if (!e.target.closest('.ref-popover') && !e.target.closest('.ref'))
+      document.getElementById('refPopover').classList.remove('open');
+  });
+
+  // ===== Open asset — show last conversation if available =====
+  function openAsset(assetName, companyName) {
+    currentAssets = [assetName];
+    document.getElementById('landing').style.display = 'none';
+    document.getElementById('chatView').classList.add('active');
+    document.getElementById('activeChatTitle').textContent = 'History';
+    document.getElementById('searchResults').classList.remove('open');
+    document.getElementById('assetSearch').value = '';
+    renderChips();
+    // Auto-open the most recent chat if one exists
+    const assetChats = allChats[assetName] || [];
+    if (assetChats.length > 0) {
+      currentChatId = assetChats[0].id;
+      showChat(assetChats[0].id);
+    } else {
+      currentChatId = null;
+      showChat('new');
+    }
+    buildHistoryDropdown();
+  }
+
+  // ===== Open specific chat from landing =====
+  function openChatFromLanding(chatId) {
+    for (const [asset, chats] of Object.entries(allChats)) {
+      const chat = chats.find(c => c.id === chatId);
+      if (chat) {
+        currentAssets = chat.assets || [asset];
+        currentChatId = chatId;
+        document.getElementById('landing').style.display = 'none';
+        document.getElementById('chatView').classList.add('active');
+        document.getElementById('activeChatTitle').textContent = 'History';
+        renderChips();
+        showChat(chatId);
+        buildHistoryDropdown();
+        return;
+      }
+    }
+  }
+
+  // ===== Build history dropdown (filtered to current assets) =====
+  function buildHistoryDropdown() {
+    const panel = document.getElementById('historyPanel');
+    const bannerRight = document.querySelector('.banner-right');
+    // Show chats that match ANY of the current assets
+    const matchingChats = [];
+    for (const [asset, chats] of Object.entries(allChats)) {
+      if (currentAssets.includes(asset)) {
+        chats.forEach(c => {
+          if (!matchingChats.find(m => m.id === c.id)) matchingChats.push(c);
+        });
+      }
+    }
+    // Hide history controls entirely when no chats exist for this asset
+    if (matchingChats.length === 0) {
+      bannerRight.style.display = 'none';
+      return;
+    }
+    bannerRight.style.display = '';
+    const label = currentAssets.length === 1 ? currentAssets[0] : currentAssets.length + ' assets';
+    let html = `<div class="hp-header">
+      <span>${label} &middot; chats</span>
+    </div>`;
+    matchingChats.forEach(chat => {
+      const isActive = chat.id === currentChatId;
+      html += `<div class="hp-item${isActive ? ' active' : ''}" onclick="switchChat('${chat.id}', '${chat.title.replace(/'/g, "\\'")}')">
+        <span class="hp-title">${chat.title}</span>
+        <span class="hp-time">${chat.time}</span>
+      </div>`;
+    });
+    panel.innerHTML = html;
+  }
+
+  // ===== Switch chat within same asset =====
+  function switchChat(chatId, title) {
+    currentChatId = chatId;
+    document.getElementById('activeChatTitle').textContent = 'History';
+    showChat(chatId);
+    buildHistoryDropdown();
+    document.getElementById('historyPanel').classList.remove('open');
+  }
+
+  // ===== New chat, same asset(s) =====
+  function newChatSameAsset() {
+    currentChatId = null;
+    document.getElementById('activeChatTitle').textContent = 'History';
+    renderChips();
+    showChat('new');
+    buildHistoryDropdown();
+    document.getElementById('historyPanel').classList.remove('open');
+  }
+
+  // ===== Show specific chat area =====
+  function showChat(chatId) {
+    document.querySelectorAll('.chat-area').forEach(c => c.style.display = 'none');
+    const el = document.getElementById('chat-' + chatId);
+    if (el) el.style.display = 'flex';
+  }
+
+  // ===== Back to landing =====
+  function backToLanding() {
+    currentAssets = [];
+    currentChatId = null;
+    document.getElementById('chatView').classList.remove('active');
+    document.getElementById('landing').style.display = '';
+    document.getElementById('historyPanel').classList.remove('open');
+  }
+
+  // ===== History dropdown toggle =====
+  function toggleHistory() {
+    document.getElementById('historyPanel').classList.toggle('open');
+  }
+
+  // ===== Source ref popover =====
+  // Map source strings to companies for deep linking
+  const sourceCompanyMap = {
+    'BHP': 'BHP Group',
+    'Lundin': 'Lundin Mining',
+    'Sandfire': 'Sandfire Resources',
+    'Freeport': 'Freeport-McMoRan',
+    'Glencore': 'Glencore',
+    'First Quantum': 'First Quantum',
+    'Wood Mackenzie': null, // third party — no company filter
+    'Escondida Technical': 'BHP Group',
+  };
+
+  function parseSourceCompany(sourceStr) {
+    if (!sourceStr) return null;
+    for (const [key, company] of Object.entries(sourceCompanyMap)) {
+      if (sourceStr.includes(key)) return company;
+    }
+    return null;
+  }
+
+  function showRef(event) {
+    event.stopPropagation();
+    const el = event.target;
+    const fragment = el.getAttribute('data-fragment');
+    const source = el.getAttribute('data-source');
+    if (!fragment) return;
+
+    const popover = document.getElementById('refPopover');
+    document.getElementById('refFragment').textContent = '\u201c' + fragment + '\u201d';
+    document.getElementById('refSourceName').textContent = source || '';
+
+    // Wire "Open source" link to deep-link into SOURCES
+    const link = document.getElementById('refSourceLink');
+    const company = parseSourceCompany(source);
+    link.onclick = (e) => {
+      e.preventDefault();
+      popover.classList.remove('open');
+      if (company) {
+        // Extract document type for type filter (Annual Report, Technical Report, etc.)
+        const typeMatch = source.match(/(Annual Report|Technical Report|Operational Review|Quarterly Report|Investor Presentation|Investor Day Presentation)/i);
+        const types = typeMatch ? [typeMatch[1].replace('Investor Day Presentation', 'Investor Presentation')] : [];
+        openRelatedSources({ company, types });
+      } else {
+        switchTab('SOURCES');
+      }
+    };
+
+    // Position near the clicked ref
+    const rect = el.getBoundingClientRect();
+    let top = rect.bottom + 8;
+    let left = rect.left - 140;
+    if (left < 16) left = 16;
+    if (left + 360 > window.innerWidth) left = window.innerWidth - 376;
+    if (top + 200 > window.innerHeight) top = rect.top - 200;
+    popover.style.top = top + 'px';
+    popover.style.left = left + 'px';
+    popover.classList.add('open');
+  }
+
+  // ===== Inline action preview (hover) =====
+  function showActionPreview(event, type, opts) {
+    const actionsBar = event.currentTarget.closest('.response-actions');
+    // Remove any existing preview
+    const existing = actionsBar.parentElement.querySelector('.action-preview-inline');
+    if (existing) existing.remove();
+
+    let listHtml = '';
+    let linkText = '';
+    let headerText = '';
+
+    if (type === 'data') {
+      headerText = 'Related Time Series';
+      const allSeries = getDataAllSeries();
+      const matches = allSeries.filter(r =>
+        r.asset === opts.asset && (opts.series || []).some(s => r.name === s)
+      );
+      listHtml = matches.map(r => {
+        const meta = [r.metal, r.unit, r.interval].filter(Boolean).join(' \u00b7 ');
+        return `<div class="action-preview-item"><span class="ap-name">${r.name}</span><span class="ap-meta">${meta}</span></div>`;
+      }).join('');
+      linkText = 'Open in Data \u2192';
+    } else {
+      headerText = 'Source Documents';
+      const companies = opts.companies || (opts.company ? [opts.company] : []);
+      const types = opts.types || [];
+      const allDocs = getSrcAllDocs();
+      const matches = allDocs.filter(d => {
+        const compMatch = companies.length === 0 || companies.includes(d.company);
+        const typeMatch = types.length === 0 || types.includes(d.type);
+        return compMatch && typeMatch;
+      });
+      listHtml = matches.map(d => {
+        return `<div class="action-preview-item"><span class="ap-name">${d.title}</span><span class="ap-meta">${d.company} \u00b7 ${d.type}</span></div>`;
+      }).join('');
+      linkText = 'Open in Sources \u2192';
+    }
+
+    const preview = document.createElement('div');
+    preview.className = 'action-preview-inline';
+    preview.innerHTML = `
+      <div class="action-preview-header"><span>${headerText}</span></div>
+      <div class="action-preview-list">${listHtml}</div>
+      <div class="action-preview-footer">
+        <span class="action-preview-link" id="apLink">${linkText}</span>
+      </div>`;
+    actionsBar.insertAdjacentElement('afterend', preview);
+
+    // Wire the link — open in new tab via hash params
+    preview.querySelector('#apLink').onclick = () => {
+      preview.remove();
+      const hash = type === 'data'
+        ? '#tab=DATA&asset=' + encodeURIComponent(opts.asset || '') + '&series=' + encodeURIComponent((opts.series || []).join(','))
+        : '#tab=SOURCES&company=' + encodeURIComponent(opts.company || (opts.companies || []).join(',')) + '&types=' + encodeURIComponent((opts.types || []).join(','));
+      window.open(window.location.pathname + hash, '_blank');
+    };
+
+    // Close on mouse leave from the whole zone (actions + preview)
+    const msgEl = actionsBar.closest('.msg.ai');
+    const onLeave = (e) => {
+      const related = e.relatedTarget;
+      if (related && (msgEl.contains(related))) return;
+      preview.remove();
+      msgEl.removeEventListener('mouseleave', onLeave);
+    };
+    msgEl.addEventListener('mouseleave', onLeave);
+
+    // Also close if hovering the other button
+    actionsBar.querySelectorAll('.response-action').forEach(btn => {
+      btn.addEventListener('mouseleave', () => {
+        // Small delay so moving to the preview doesn't instantly close
+        setTimeout(() => {
+          if (!preview.matches(':hover') && !actionsBar.matches(':hover')) {
+            preview.remove();
+          }
+        }, 150);
+      }, { once: true });
+    });
+
+    // Scroll into view
+    setTimeout(() => preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+  }
+
+  // ===== Follow-up demo response (within existing chats) =====
+  function sendFollowup(inputEl) {
+    const question = inputEl.value.trim();
+    if (!question) return;
+    // Find the .chat-messages container for this chat
+    const chatArea = inputEl.closest('.chat-area');
+    const messages = chatArea.querySelector('.chat-messages');
+    // Add user message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'msg user';
+    userMsg.textContent = question;
+    messages.appendChild(userMsg);
+    // Add demo AI response
+    const assetName = currentAssets[0] || 'this asset';
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'msg ai';
+    aiMsg.innerHTML = `<div class="demo-badge">Demo response</div>
+      <div style="margin-bottom: 14px;">Looking at the latest data for ${assetName}:</div>
+      <div class="timeline-entry"><span class="year">Finding:</span> The analysis suggests a structural shift rather than a cyclical pattern — consistent with mine plan progression into deeper zones. <span class="ref" data-fragment="This is a simulated source fragment for demonstration purposes. In the live product, this would contain the actual extracted text from ${assetName}'s operational reports." data-source="Demo — Source Document" onclick="showRef(event)">1</span></div>
+      <div class="timeline-entry"><span class="year">Context:</span> Peer comparison shows ${assetName} tracking within the expected range for assets at a similar stage of mine life. <span class="ref" data-fragment="This is a simulated source fragment for demonstration purposes." data-source="Demo — Source Document" onclick="showRef(event)">2</span></div>
+      <div class="followup">Would you like me to dig deeper into any of these points?</div>`;
+    messages.appendChild(aiMsg);
+    inputEl.value = '';
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  // ===== Demo response for assets without history =====
+  const demoResponses = {
+    'default': {
+      intro: 'Based on the latest filings and operational reports:',
+      entries: [
+        { label: 'Production:', text: 'Copper output was 42.3 kt in FY2024, up 8% YoY following the completion of the Phase 2 expansion.' },
+        { label: 'Grade:', text: 'Head grade averaged 1.12% Cu — in line with the feasibility study profile for Year 3 of operations.' },
+        { label: 'Costs:', text: 'C1 cash costs at $1.52/lb, benefiting from higher throughput and favourable exchange rates.' },
+      ],
+      followup: 'What would you like to explore further?',
+    }
+  };
+
+  function sendDemo() {
+    const centerInput = document.getElementById('newChatInput');
+    const bottomInput = document.getElementById('newChatInputBottom');
+    const question = centerInput.value.trim() || bottomInput.value.trim();
+    if (!question) return;
+
+    const messages = document.getElementById('newChatMessages');
+    const empty = document.getElementById('newChatEmpty');
+    const inputBar = document.getElementById('newChatInputBar');
+
+    // Switch from centered to messages layout
+    empty.style.display = 'none';
+    messages.style.display = 'flex';
+    inputBar.style.display = '';
+
+    // Add user message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'msg user';
+    userMsg.textContent = question;
+    messages.appendChild(userMsg);
+
+    // Build demo AI response
+    const resp = demoResponses['default'];
+    const assetName = currentAssets[0] || 'this asset';
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'msg ai';
+    let html = `<div class="demo-badge">Demo response</div>`;
+    html += `<div style="margin-bottom: 14px;">${resp.intro}</div>`;
+    resp.entries.forEach((e, i) => {
+      html += `<div class="timeline-entry"><span class="year">${e.label}</span> ${e.text} <span class="ref" data-fragment="This is a simulated source fragment for demonstration purposes. In the live product, this would contain the actual extracted text from ${assetName}'s operational reports." data-source="Demo — Source Document" onclick="showRef(event)">${i+1}</span></div>`;
+    });
+    html += `<div class="followup">${resp.followup}</div>`;
+    aiMsg.innerHTML = html;
+    messages.appendChild(aiMsg);
+
+    // Clear inputs
+    centerInput.value = '';
+    bottomInput.value = '';
+    bottomInput.focus();
+
+    // Scroll to bottom
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  // ===== NAV TAB SWITCHING =====
+  function switchTab(tabName) {
+    // Update nav styling
+    document.querySelectorAll('.nav-tabs a').forEach(a => a.classList.remove('active'));
+    document.querySelectorAll('.nav-tabs a').forEach(a => {
+      if (a.textContent.trim() === tabName) a.classList.add('active');
+    });
+
+    // Hide all views
+    document.getElementById('landing').style.display = 'none';
+    document.getElementById('chatView').classList.remove('active');
+    document.getElementById('dataView').classList.remove('active');
+    document.getElementById('sourcesView').classList.remove('active');
+
+    if (tabName === 'ASSET ANALYST') {
+      // Return to whatever state (landing or chat)
+      if (currentAssets.length > 0 && currentChatId !== null) {
+        document.getElementById('chatView').classList.add('active');
+      } else if (currentAssets.length > 0) {
+        document.getElementById('chatView').classList.add('active');
+      } else {
+        document.getElementById('landing').style.display = '';
+      }
+    } else if (tabName === 'DATA') {
+      document.getElementById('dataView').classList.add('active');
+      initDataView();
+    } else if (tabName === 'SOURCES') {
+      document.getElementById('sourcesView').classList.add('active');
+      initSourcesView();
+    }
+  }
+
+  // ===== Open DATA tab for an asset (from chat chip) =====
+  function openDataTab(assetName) {
+    switchTab('DATA');
+    // Pre-fill search with asset name
+    setTimeout(() => {
+      const search = document.getElementById('dataSearch');
+      if (search) { search.value = assetName; renderDataTable(); }
+    }, 50);
+  }
+
+  // ===== Open nav tab (from chat chip) =====
+  function openNavTab(tab) {
+    if (tab === 'data') {
+      // Context-aware: filter by current assets
+      if (currentAssets.length > 0) {
+        openRelatedData({ assets: currentAssets });
+      } else {
+        switchTab('DATA');
+      }
+    } else if (tab === 'sources') {
+      // Context-aware: filter by current asset companies
+      if (currentAssets.length > 0) {
+        const companies = [...new Set(currentAssets.map(a => assetCompanyMap[a]).filter(Boolean))];
+        if (companies.length > 0) {
+          openRelatedSources({ companies });
+        } else {
+          switchTab('SOURCES');
+        }
+      } else {
+        switchTab('SOURCES');
+      }
+    }
+  }
+
+  // ===== Deep-link: Open DATA tab with related series pre-filtered =====
+  function openRelatedData(opts) {
+    switchTab('DATA');
+    setTimeout(() => {
+      // Clear existing filters
+      dataSelectedCompanies.clear();
+      dataSelectedAssets.clear();
+      dataSelectedMetals.clear();
+
+      // Apply asset filter(s)
+      const assets = opts.assets || (opts.asset ? [opts.asset] : []);
+      assets.forEach(a => dataSelectedAssets.add(a));
+
+      // If specific series names provided, use search
+      const search = document.getElementById('dataSearch');
+      if (opts.series && opts.series.length > 0) {
+        // For series, we use search since there's no series filter dropdown
+        // Join with | for readability — user sees the search term
+        search.value = opts.series.length === 1 ? opts.series[0] : '';
+      } else {
+        search.value = '';
+      }
+
+      // Update button highlights
+      ['dataCompanyBtn', 'dataAssetBtn', 'dataMetalBtn'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.classList.remove('has-filter');
+      });
+      if (dataSelectedAssets.size > 0) {
+        document.getElementById('dataAssetBtn').classList.add('has-filter');
+      }
+
+      // Rebuild dropdowns and render
+      buildDataDropdown('company');
+      buildDataDropdown('asset');
+      buildDataDropdown('metal');
+      renderDataChips();
+      renderDataTable();
+
+      // If specific series provided, highlight matching rows briefly
+      if (opts.series && opts.series.length > 0) {
+        highlightRelatedRows(opts.series);
+      }
+    }, 50);
+  }
+
+  function highlightRelatedRows(seriesNames) {
+    const rows = document.querySelectorAll('#dataTableBody tr');
+    const nameSet = new Set(seriesNames.map(s => s.toLowerCase()));
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      if (cells.length >= 3) {
+        const seriesName = cells[2].textContent.trim().toLowerCase();
+        if (nameSet.has(seriesName)) {
+          row.style.background = 'rgba(108,73,182,0.15)';
+          row.style.transition = 'background 2s';
+          setTimeout(() => { row.style.background = ''; }, 3000);
+        }
+      }
+    });
+  }
+
+  // ===== Deep-link: Open SOURCES tab with related docs pre-filtered =====
+  function openRelatedSources(opts) {
+    switchTab('SOURCES');
+    setTimeout(() => {
+      // Clear existing filters
+      srcSelectedCompanies.clear();
+      srcSelectedTypes.clear();
+
+      // Apply company filter(s)
+      const companies = opts.companies || (opts.company ? [opts.company] : []);
+      companies.forEach(c => srcSelectedCompanies.add(c));
+
+      // Apply type filter(s)
+      if (opts.types) {
+        opts.types.forEach(t => srcSelectedTypes.add(t));
+      }
+
+      // Update button highlights
+      const compBtn = document.getElementById('srcCompanyBtn');
+      const typeBtn = document.getElementById('srcTypeBtn');
+      if (compBtn) compBtn.classList.toggle('has-filter', srcSelectedCompanies.size > 0);
+      if (typeBtn) typeBtn.classList.toggle('has-filter', srcSelectedTypes.size > 0);
+
+      // Set search if provided, otherwise clear
+      const search = document.querySelector('.sources-search');
+      if (search) search.value = opts.search || '';
+
+      // Rebuild and render
+      buildSrcDropdown('company');
+      buildSrcDropdown('type');
+      renderSrcChips();
+      renderSrcTable();
+    }, 50);
+  }
+
+  // ===== DATA TAB: Asset database =====
+  const dataAssets = [
+    { name: 'Escondida', company: 'BHP Group', exchange: 'ASX:BHP', metals: ['Copper'], country: 'Chile', type: 'Open Pit' },
+    { name: 'Olympic Dam', company: 'BHP Group', exchange: 'ASX:BHP', metals: ['Copper', 'Gold'], country: 'Australia', type: 'Underground' },
+    { name: 'Spence', company: 'BHP Group', exchange: 'ASX:BHP', metals: ['Copper'], country: 'Chile', type: 'Open Pit' },
+    { name: 'Neves-Corvo', company: 'Lundin Mining', exchange: 'TSX:LUN', metals: ['Copper', 'Zinc'], country: 'Portugal', type: 'Underground' },
+    { name: 'Chapada', company: 'Lundin Mining', exchange: 'TSX:LUN', metals: ['Copper', 'Gold'], country: 'Brazil', type: 'Open Pit' },
+    { name: 'Caserones', company: 'Lundin Mining', exchange: 'TSX:LUN', metals: ['Copper'], country: 'Chile', type: 'Open Pit' },
+    { name: 'Candelaria', company: 'Lundin Mining', exchange: 'TSX:LUN', metals: ['Copper', 'Gold'], country: 'Chile', type: 'Underground' },
+    { name: 'Zinkgruvan', company: 'Lundin Mining', exchange: 'TSX:LUN', metals: ['Zinc'], country: 'Sweden', type: 'Underground' },
+    { name: 'Eagle', company: 'Lundin Mining', exchange: 'TSX:LUN', metals: ['Nickel', 'Copper'], country: 'USA', type: 'Underground' },
+    { name: 'Motheo', company: 'Sandfire Resources', exchange: 'ASX:SFR', metals: ['Copper'], country: 'Botswana', type: 'Open Pit' },
+    { name: 'MATSA', company: 'Sandfire Resources', exchange: 'ASX:SFR', metals: ['Copper', 'Zinc'], country: 'Spain', type: 'Underground' },
+    { name: 'DeGrussa', company: 'Sandfire Resources', exchange: 'ASX:SFR', metals: ['Copper', 'Gold'], country: 'Australia', type: 'Underground' },
+    { name: 'Grasberg', company: 'Freeport-McMoRan', exchange: 'NYSE:FCX', metals: ['Copper', 'Gold'], country: 'Indonesia', type: 'Underground' },
+    { name: 'Cerro Verde', company: 'Freeport-McMoRan', exchange: 'NYSE:FCX', metals: ['Copper'], country: 'Peru', type: 'Open Pit' },
+    { name: 'Morenci', company: 'Freeport-McMoRan', exchange: 'NYSE:FCX', metals: ['Copper'], country: 'USA', type: 'Open Pit' },
+    { name: 'Mount Isa', company: 'Glencore', exchange: 'LSE:GLEN', metals: ['Copper', 'Zinc'], country: 'Australia', type: 'Underground' },
+    { name: 'Antamina', company: 'Glencore', exchange: 'LSE:GLEN', metals: ['Copper', 'Zinc'], country: 'Peru', type: 'Open Pit' },
+    { name: 'Collahuasi', company: 'Glencore', exchange: 'LSE:GLEN', metals: ['Copper'], country: 'Chile', type: 'Open Pit' },
+    { name: 'Cobre Panama', company: 'First Quantum', exchange: 'TSX:FM', metals: ['Copper', 'Gold'], country: 'Panama', type: 'Open Pit' },
+    { name: 'Kansanshi', company: 'First Quantum', exchange: 'TSX:FM', metals: ['Copper', 'Gold'], country: 'Zambia', type: 'Open Pit' },
+    { name: 'Sentinel', company: 'First Quantum', exchange: 'TSX:FM', metals: ['Copper'], country: 'Zambia', type: 'Open Pit' },
+  ];
+
+  function getSeriesForAsset(asset) {
+    const series = [];
+    const primaryMetal = asset.metals[0];
+    series.push({ section: 'Actual', subsection: 'Operations', name: 'Ore Mined', unit: 'Mt', metal: '', interval: 'FQ' });
+    series.push({ section: 'Actual', subsection: 'Operations', name: 'Ore Milled', unit: 'Mt', metal: '', interval: 'FQ' });
+    series.push({ section: 'Actual', subsection: 'Operations', name: 'Head Grade', unit: '%', metal: primaryMetal, interval: 'FQ' });
+    series.push({ section: 'Actual', subsection: 'Operations', name: 'Recovery Rate', unit: '%', metal: primaryMetal, interval: 'FQ' });
+    asset.metals.forEach(m => {
+      series.push({ section: 'Actual', subsection: 'Production', name: 'Contained Metal', unit: 'kt', metal: m, interval: 'FQ' });
+      series.push({ section: 'Actual', subsection: 'Production', name: 'Payable Metal', unit: 'kt', metal: m, interval: 'FQ' });
+    });
+    asset.metals.forEach(m => {
+      series.push({ section: 'Actual', subsection: 'Sales', name: 'Revenue', unit: 'US$m', metal: m, interval: 'FQ' });
+    });
+    series.push({ section: 'Actual', subsection: 'Financial', name: 'C1 Cash Cost', unit: 'US$/lb', metal: primaryMetal, interval: 'FQ' });
+    series.push({ section: 'Actual', subsection: 'Financial', name: 'AISC', unit: 'US$/lb', metal: primaryMetal, interval: 'FQ' });
+    series.push({ section: 'Actual', subsection: 'Financial', name: 'By-Product Credits', unit: 'US$/lb', metal: primaryMetal, interval: 'FQ' });
+    asset.metals.forEach(m => {
+      series.push({ section: 'Estimated', subsection: 'Guidance', name: 'Production Guidance', unit: 'kt', metal: m, interval: 'FY' });
+    });
+    series.push({ section: 'Estimated', subsection: 'Guidance', name: 'C1 Guidance', unit: 'US$/lb', metal: primaryMetal, interval: 'FY' });
+    asset.metals.forEach(m => {
+      series.push({ section: 'Estimated', subsection: 'Reserves', name: 'Proven Reserve', unit: 'Mt', metal: m, interval: 'FY' });
+      series.push({ section: 'Estimated', subsection: 'Reserves', name: 'Probable Reserve', unit: 'Mt', metal: m, interval: 'FY' });
+    });
+    series.push({ section: 'Estimated', subsection: 'Life of Mine Plan', name: 'Mine Life Remaining', unit: 'Years', metal: '', interval: 'FY' });
+    series.push({ section: 'Estimated', subsection: 'Life of Mine Plan', name: 'Sustaining Capex', unit: 'US$m', metal: '', interval: 'FY' });
+    series.push({ section: 'Estimated', subsection: 'Life of Mine Plan', name: 'Expansion Capex', unit: 'US$m', metal: '', interval: 'FY' });
+    series.push({ section: 'Ownership', subsection: 'Equity Interest', name: 'Ownership Stake', unit: '%', metal: '', interval: 'FY' });
+    return series;
+  }
+
+  // Multi-select filter state
+  let dataSelectedCompanies = new Set();
+  let dataSelectedAssets = new Set();
+  let dataSelectedMetals = new Set();
+  let dataCart = [];
+
+  const dataAllCompanies = [...new Set(dataAssets.map(a => a.company))];
+  const dataAllAssets = dataAssets.map(a => a.name).sort();
+  const dataAllMetals = [...new Set(dataAssets.flatMap(a => a.metals))];
+
+  // Build flat list of all series across all assets
+  function getDataAllSeries() {
+    const all = [];
+    dataAssets.forEach(a => {
+      getSeriesForAsset(a).forEach(s => {
+        all.push({ ...s, asset: a.name, company: a.company, exchange: a.exchange });
+      });
+    });
+    return all;
+  }
+
+  function initDataView() {
+    buildDataDropdown('company');
+    buildDataDropdown('asset');
+    buildDataDropdown('metal');
+    renderDataTable();
+  }
+
+  function buildDataDropdown(which) {
+    const containerMap = { company: 'dataCompanyDropdown', asset: 'dataAssetDropdown', metal: 'dataMetalDropdown' };
+    const itemsMap = { company: dataAllCompanies, asset: dataAllAssets, metal: dataAllMetals };
+    const selectedMap = { company: dataSelectedCompanies, asset: dataSelectedAssets, metal: dataSelectedMetals };
+    const container = document.getElementById(containerMap[which]);
+    const items = itemsMap[which];
+    const selected = selectedMap[which];
+
+    container.innerHTML = items.map(item => {
+      const sel = selected.has(item) ? ' selected' : '';
+      return `<div class="data-filter-option${sel}" onclick="toggleDataFilter('${which}', '${item.replace(/'/g, "\\'")}')">
+        <span class="opt-check"></span>
+        <span>${item}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function toggleDataDropdown(which) {
+    const ddMap = { company: 'dataCompanyDropdown', asset: 'dataAssetDropdown', metal: 'dataMetalDropdown' };
+    const dd = document.getElementById(ddMap[which]);
+    Object.entries(ddMap).forEach(([k, id]) => {
+      if (k !== which) document.getElementById(id)?.classList.remove('open');
+    });
+    dd.classList.toggle('open');
+  }
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#dataCompanyFilterWrap')) {
+      document.getElementById('dataCompanyDropdown')?.classList.remove('open');
+    }
+    if (!e.target.closest('#dataAssetFilterWrap')) {
+      document.getElementById('dataAssetDropdown')?.classList.remove('open');
+    }
+    if (!e.target.closest('#dataMetalFilterWrap')) {
+      document.getElementById('dataMetalDropdown')?.classList.remove('open');
+    }
+    if (!e.target.closest('#dataCartWrap')) {
+      document.getElementById('dataCartPopover')?.classList.remove('open');
+    }
+  });
+
+  function toggleDataFilter(which, value) {
+    const selectedMap = { company: dataSelectedCompanies, asset: dataSelectedAssets, metal: dataSelectedMetals };
+    const btnMap = { company: 'dataCompanyBtn', asset: 'dataAssetBtn', metal: 'dataMetalBtn' };
+    const selected = selectedMap[which];
+    if (selected.has(value)) selected.delete(value);
+    else selected.add(value);
+
+    document.getElementById(btnMap[which]).classList.toggle('has-filter', selected.size > 0);
+
+    buildDataDropdown(which);
+    renderDataChips();
+    renderDataTable();
+  }
+
+  function removeDataFilter(which, value) {
+    const selectedMap = { company: dataSelectedCompanies, asset: dataSelectedAssets, metal: dataSelectedMetals };
+    const btnMap = { company: 'dataCompanyBtn', asset: 'dataAssetBtn', metal: 'dataMetalBtn' };
+    const selected = selectedMap[which];
+    selected.delete(value);
+    document.getElementById(btnMap[which]).classList.toggle('has-filter', selected.size > 0);
+    buildDataDropdown(which);
+    renderDataChips();
+    renderDataTable();
+  }
+
+  function renderDataChips() {
+    const el = document.getElementById('dataChips');
+    const chips = [];
+    dataSelectedCompanies.forEach(c => {
+      chips.push(`<span class="data-filter-chip">${c} <span class="chip-x" onclick="event.stopPropagation();removeDataFilter('company','${c.replace(/'/g, "\\'")}')">&times;</span></span>`);
+    });
+    dataSelectedAssets.forEach(a => {
+      chips.push(`<span class="data-filter-chip">${a} <span class="chip-x" onclick="event.stopPropagation();removeDataFilter('asset','${a.replace(/'/g, "\\'")}')">&times;</span></span>`);
+    });
+    dataSelectedMetals.forEach(m => {
+      chips.push(`<span class="data-filter-chip">${m} <span class="chip-x" onclick="event.stopPropagation();removeDataFilter('metal','${m.replace(/'/g, "\\'")}')">&times;</span></span>`);
+    });
+    el.innerHTML = chips.join('');
+  }
+
+  function renderDataTable() {
+    let rows = getDataAllSeries();
+    const searchText = (document.getElementById('dataSearch')?.value || '').toLowerCase();
+
+    if (dataSelectedCompanies.size > 0) {
+      rows = rows.filter(r => dataSelectedCompanies.has(r.company));
+    }
+    if (dataSelectedAssets.size > 0) {
+      rows = rows.filter(r => dataSelectedAssets.has(r.asset));
+    }
+    if (dataSelectedMetals.size > 0) {
+      rows = rows.filter(r => {
+        const asset = dataAssets.find(a => a.name === r.asset);
+        return asset && asset.metals.some(m => dataSelectedMetals.has(m));
+      });
+    }
+    if (searchText) {
+      rows = rows.filter(r =>
+        r.name.toLowerCase().includes(searchText) ||
+        r.asset.toLowerCase().includes(searchText) ||
+        r.company.toLowerCase().includes(searchText) ||
+        r.section.toLowerCase().includes(searchText) ||
+        r.metal.toLowerCase().includes(searchText) ||
+        r.unit.toLowerCase().includes(searchText));
+    }
+
+    document.getElementById('seriesCount').textContent = `${rows.length} Series`;
+
+    const tbody = document.getElementById('dataTableBody');
+    tbody.innerHTML = rows.map(r => {
+      const seriesId = `${r.asset}::${r.name}::${r.metal}`;
+      const isActive = dataCart.some(c => c.id === seriesId);
+      return `<tr>
+        <td class="dt-asset">${r.asset}</td>
+        <td class="dt-company">${r.company}</td>
+        <td>${r.name}</td>
+        <td class="dt-section"><span class="class-tag tag-${r.section.toLowerCase()}">${r.section}</span></td>
+        <td class="dt-unit">${r.unit}</td>
+        <td class="dt-metal">${r.metal}</td>
+        <td class="dt-interval">${r.interval}</td>
+        <td><button class="series-toggle${isActive ? ' active' : ''}"
+             data-id="${seriesId.replace(/"/g, '&quot;')}"
+             data-asset="${r.asset}" data-name="${r.name}"
+             data-metal="${r.metal}" data-unit="${r.unit}"
+             onclick="toggleCartItem(this)"></button></td>
+      </tr>`;
+    }).join('');
+
+    updateSelectAllState();
+    updateDataCartCount();
+  }
+
+  function toggleCartItem(btn) {
+    const id = btn.dataset.id;
+    if (btn.classList.contains('active')) {
+      btn.classList.remove('active');
+      dataCart = dataCart.filter(c => c.id !== id);
+    } else {
+      btn.classList.add('active');
+      if (!dataCart.some(c => c.id === id)) {
+        dataCart.push({ id, asset: btn.dataset.asset, name: btn.dataset.name,
+                        metal: btn.dataset.metal, unit: btn.dataset.unit });
+      }
+    }
+    updateDataCartCount();
+    updateSelectAllState();
+  }
+
+  function toggleSelectAll() {
+    const toggles = document.querySelectorAll('#dataTableBody .series-toggle');
+    if (toggles.length === 0) return;
+    const allActive = Array.from(toggles).every(t => t.classList.contains('active'));
+    toggles.forEach(btn => {
+      const id = btn.dataset.id;
+      if (allActive) {
+        btn.classList.remove('active');
+        dataCart = dataCart.filter(c => c.id !== id);
+      } else if (!btn.classList.contains('active')) {
+        btn.classList.add('active');
+        if (!dataCart.some(c => c.id === id)) {
+          dataCart.push({ id, asset: btn.dataset.asset, name: btn.dataset.name,
+                          metal: btn.dataset.metal, unit: btn.dataset.unit });
+        }
+      }
+    });
+    updateDataCartCount();
+    updateSelectAllState();
+  }
+
+  function updateSelectAllState() {
+    const btn = document.getElementById('selectAllBtn');
+    if (!btn) return;
+    const toggles = document.querySelectorAll('#dataTableBody .series-toggle');
+    if (toggles.length === 0) {
+      btn.textContent = 'Select All';
+      btn.classList.remove('all-selected');
+      return;
+    }
+    const allActive = Array.from(toggles).every(t => t.classList.contains('active'));
+    btn.textContent = allActive ? 'Unselect All' : 'Select All';
+    btn.classList.toggle('all-selected', allActive);
+  }
+
+  function updateDataCartCount() {
+    document.getElementById('dataCartCount').textContent = dataCart.length;
+    document.getElementById('dataCartDownloadBtn').disabled = dataCart.length === 0;
+    // Re-render popover if it's open
+    if (document.getElementById('dataCartPopover').classList.contains('open')) {
+      renderCartPopover();
+    }
+  }
+
+  function toggleDataCart() {
+    const pop = document.getElementById('dataCartPopover');
+    pop.classList.toggle('open');
+    if (pop.classList.contains('open')) renderCartPopover();
+  }
+
+  function renderCartPopover() {
+    const body = document.getElementById('dataCartBody');
+    if (dataCart.length === 0) {
+      body.innerHTML = '<div class="data-cart-empty">Your data cart is empty.<br>Toggle series to add them.</div>';
+      return;
+    }
+    // Group by asset
+    const groups = {};
+    dataCart.forEach(c => {
+      if (!groups[c.asset]) groups[c.asset] = [];
+      groups[c.asset].push(c);
+    });
+    let html = '';
+    Object.keys(groups).sort().forEach(asset => {
+      html += `<div class="cart-asset-group">`;
+      html += `<div class="cart-asset-label">${asset} (${groups[asset].length})</div>`;
+      groups[asset].forEach(item => {
+        const meta = [item.metal, item.unit].filter(Boolean).join(' · ');
+        html += `<div class="cart-item">
+          <div class="cart-item-info">
+            <span class="cart-item-name">${item.name}</span>
+            <span class="cart-item-meta">${meta}</span>
+          </div>
+          <button class="cart-item-remove" onclick="event.stopPropagation();removeCartItem('${item.id.replace(/'/g, "\\'")}')" title="Remove">&times;</button>
+        </div>`;
+      });
+      html += `</div>`;
+    });
+    body.innerHTML = html;
+  }
+
+  function removeCartItem(id) {
+    dataCart = dataCart.filter(c => c.id !== id);
+    // Un-toggle the button in the table if visible
+    const btn = document.querySelector(`#dataTableBody .series-toggle[data-id="${CSS.escape(id)}"]`);
+    if (btn) btn.classList.remove('active');
+    updateDataCartCount();
+    updateSelectAllState();
+  }
+
+  function clearDataCart() {
+    dataCart = [];
+    document.querySelectorAll('#dataTableBody .series-toggle.active').forEach(b => b.classList.remove('active'));
+    updateDataCartCount();
+    updateSelectAllState();
+  }
+
+  function downloadDataCart() {
+    if (dataCart.length === 0) return;
+    alert(`DEMO — Would download ${dataCart.length} series across ${new Set(dataCart.map(c => c.asset)).size} assets`);
+  }
+
+  // ===== SOURCES TAB =====
+  const srcCompanies = [
+    { name: 'BHP Group', exchange: 'ASX:BHP', ticker: 'BHP' },
+    { name: 'Lundin Mining', exchange: 'TSX:LUN', ticker: 'LUN' },
+    { name: 'Sandfire Resources', exchange: 'ASX:SFR', ticker: 'SFR' },
+    { name: 'Freeport-McMoRan', exchange: 'NYSE:FCX', ticker: 'FCX' },
+    { name: 'Glencore', exchange: 'LSE:GLEN', ticker: 'GLEN' },
+    { name: 'First Quantum', exchange: 'TSX:FM', ticker: 'FM' },
+  ];
+
+  const srcDocuments = {
+    'BHP Group': [
+      { title: '2024 Annual Report', type: 'Annual Report', pubDate: '2024 September 17', avail: '2024 October 2', series: 86 },
+      { title: '2023 Annual Report', type: 'Annual Report', pubDate: '2023 September 19', avail: '2023 October 5', series: 84 },
+      { title: 'Q2 FY2025 Quarterly Report', type: 'Quarterly Report', pubDate: '2025 January 21', avail: '2025 January 28', series: 42 },
+      { title: 'Q1 FY2025 Quarterly Report', type: 'Quarterly Report', pubDate: '2024 October 17', avail: '2024 October 22', series: 42 },
+      { title: 'Q4 FY2024 Quarterly Report', type: 'Quarterly Report', pubDate: '2024 July 23', avail: '2024 July 30', series: 44 },
+      { title: 'FY2024 MD&A', type: 'MD&A', pubDate: '2024 September 17', avail: '2024 October 8', series: 61 },
+      { title: 'Olympic Dam JORC Report 2024', type: 'JORC', pubDate: '2024 September 17', avail: '2024 November 1', series: 18 },
+      { title: 'H1 FY2025 Earnings Call Transcript', type: 'Transcript', pubDate: '2025 February 18', avail: '2025 February 19', series: 0 },
+      { title: 'FY2024 Earnings Call Transcript', type: 'Transcript', pubDate: '2024 August 27', avail: '2024 August 28', series: 0 },
+    ],
+    'Lundin Mining': [
+      { title: '2024 Annual Report', type: 'Annual Report', pubDate: '2024 March 14', avail: '2024 April 1', series: 72 },
+      { title: '2023 Annual Report', type: 'Annual Report', pubDate: '2023 March 16', avail: '2023 April 3', series: 68 },
+      { title: '2022 Annual Report', type: 'Annual Report', pubDate: '2022 March 17', avail: '2022 April 2', series: 65 },
+      { title: 'Q3 2024 Quarterly Report', type: 'Quarterly Report', pubDate: '2024 October 30', avail: '2024 November 5', series: 38 },
+      { title: 'Q2 2024 Quarterly Report', type: 'Quarterly Report', pubDate: '2024 July 25', avail: '2024 August 1', series: 36 },
+      { title: 'Q1 2024 Quarterly Report', type: 'Quarterly Report', pubDate: '2024 April 25', avail: '2024 May 2', series: 35 },
+      { title: 'Neves-Corvo NI 43-101 Technical Report', type: 'Technical Report', pubDate: '2023 June 15', avail: '2023 August 10', series: 22 },
+      { title: 'Q3 2024 Earnings Call Transcript', type: 'Transcript', pubDate: '2024 October 31', avail: '2024 November 1', series: 0 },
+      { title: '2023 MD&A', type: 'MD&A', pubDate: '2024 March 14', avail: '2024 April 8', series: 48 },
+    ],
+    'Sandfire Resources': [
+      { title: '2024 Annual Report', type: 'Annual Report', pubDate: '2024 September 26', avail: '2024 October 10', series: 54 },
+      { title: '2023 Annual Report', type: 'Annual Report', pubDate: '2023 September 28', avail: '2023 October 12', series: 51 },
+      { title: 'Q1 FY2025 Quarterly Report', type: 'Quarterly Report', pubDate: '2024 October 24', avail: '2024 November 1', series: 28 },
+      { title: 'Q4 FY2024 Quarterly Report', type: 'Quarterly Report', pubDate: '2024 July 18', avail: '2024 July 25', series: 26 },
+      { title: 'Motheo JORC Report 2024', type: 'JORC', pubDate: '2024 September 26', avail: '2024 November 15', series: 14 },
+      { title: 'FY2024 Earnings Call Transcript', type: 'Transcript', pubDate: '2024 August 22', avail: '2024 August 23', series: 0 },
+    ],
+    'Freeport-McMoRan': [
+      { title: '2024 10K', type: '10K', pubDate: '2025 February 14', avail: '2025 March 1', series: 92 },
+      { title: '2023 10K', type: '10K', pubDate: '2024 February 15', avail: '2024 March 2', series: 88 },
+      { title: 'Q3 2024 Quarterly Report', type: 'Quarterly Report', pubDate: '2024 October 22', avail: '2024 October 28', series: 46 },
+      { title: 'Q2 2024 Quarterly Report', type: 'Quarterly Report', pubDate: '2024 July 23', avail: '2024 July 30', series: 44 },
+      { title: 'Grasberg Technical Report 2023', type: 'Technical Report', pubDate: '2023 December 20', avail: '2024 February 15', series: 32 },
+      { title: 'Q3 2024 Earnings Call Transcript', type: 'Transcript', pubDate: '2024 October 22', avail: '2024 October 23', series: 0 },
+      { title: '2023 MD&A', type: 'MD&A', pubDate: '2024 February 15', avail: '2024 March 10', series: 55 },
+    ],
+    'Glencore': [
+      { title: '2024 Annual Report', type: 'Annual Report', pubDate: '2025 March 5', avail: '2025 March 18', series: 105 },
+      { title: '2023 Annual Report', type: 'Annual Report', pubDate: '2024 March 6', avail: '2024 March 20', series: 98 },
+      { title: 'H1 2024 Half-Year Report', type: 'Quarterly Report', pubDate: '2024 August 7', avail: '2024 August 15', series: 52 },
+      { title: 'Q3 2024 Production Report', type: 'Quarterly Report', pubDate: '2024 October 30', avail: '2024 November 4', series: 38 },
+      { title: 'H1 2024 Earnings Call Transcript', type: 'Transcript', pubDate: '2024 August 7', avail: '2024 August 8', series: 0 },
+    ],
+    'First Quantum': [
+      { title: '2024 Annual Report', type: 'Annual Report', pubDate: '2025 February 12', avail: '2025 March 1', series: 62 },
+      { title: '2023 Annual Report', type: 'Annual Report', pubDate: '2024 February 14', avail: '2024 March 4', series: 58 },
+      { title: 'Q3 2024 Quarterly Report', type: 'Quarterly Report', pubDate: '2024 October 28', avail: '2024 November 3', series: 32 },
+      { title: 'Q2 2024 Quarterly Report', type: 'Quarterly Report', pubDate: '2024 July 24', avail: '2024 August 1', series: 30 },
+      { title: 'Cobre Panama Technical Report', type: 'Technical Report', pubDate: '2023 March 30', avail: '2023 May 15', series: 24 },
+      { title: 'Q3 2024 Earnings Call Transcript', type: 'Transcript', pubDate: '2024 October 29', avail: '2024 October 30', series: 0 },
+      { title: '2023 MD&A', type: 'MD&A', pubDate: '2024 February 14', avail: '2024 March 12', series: 41 },
+    ],
+  };
+
+  // Multi-select filter state
+  let srcSelectedCompanies = new Set();
+  let srcSelectedTypes = new Set();
+  let srcSelectedDocs = [];
+
+  const srcAllTypes = ['Annual Report', '10K', 'Quarterly Report', 'MD&A', 'JORC', 'Transcript', 'Technical Report'];
+
+  // Build flat list of all documents with company info
+  function getSrcAllDocs() {
+    const all = [];
+    srcCompanies.forEach(c => {
+      (srcDocuments[c.name] || []).forEach(d => {
+        all.push({ ...d, company: c.name, exchange: c.exchange });
+      });
+    });
+    return all;
+  }
+
+  function initSourcesView() {
+    buildSrcDropdown('company');
+    buildSrcDropdown('type');
+    renderSrcTable();
+  }
+
+  function buildSrcDropdown(which) {
+    const container = which === 'company'
+      ? document.getElementById('srcCompanyDropdown')
+      : document.getElementById('srcTypeDropdown');
+    const items = which === 'company'
+      ? srcCompanies.map(c => c.name)
+      : srcAllTypes;
+    const selected = which === 'company' ? srcSelectedCompanies : srcSelectedTypes;
+
+    container.innerHTML = items.map(item => {
+      const sel = selected.has(item) ? ' selected' : '';
+      return `<div class="sources-filter-option${sel}" onclick="toggleSrcFilter('${which}', '${item.replace(/'/g, "\\'")}')">
+        <span class="opt-check"></span>
+        <span>${item}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function toggleSrcDropdown(which) {
+    const dd = which === 'company'
+      ? document.getElementById('srcCompanyDropdown')
+      : document.getElementById('srcTypeDropdown');
+    const other = which === 'company'
+      ? document.getElementById('srcTypeDropdown')
+      : document.getElementById('srcCompanyDropdown');
+    other.classList.remove('open');
+    dd.classList.toggle('open');
+  }
+
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#srcCompanyFilterWrap')) {
+      document.getElementById('srcCompanyDropdown').classList.remove('open');
+    }
+    if (!e.target.closest('#srcTypeFilterWrap')) {
+      document.getElementById('srcTypeDropdown').classList.remove('open');
+    }
+  });
+
+  function toggleSrcFilter(which, value) {
+    const selected = which === 'company' ? srcSelectedCompanies : srcSelectedTypes;
+    if (selected.has(value)) selected.delete(value);
+    else selected.add(value);
+
+    // Update button style
+    const btn = which === 'company'
+      ? document.getElementById('srcCompanyBtn')
+      : document.getElementById('srcTypeBtn');
+    btn.classList.toggle('has-filter', selected.size > 0);
+
+    buildSrcDropdown(which);
+    renderSrcChips();
+    renderSrcTable();
+  }
+
+  function removeSrcFilter(which, value) {
+    const selected = which === 'company' ? srcSelectedCompanies : srcSelectedTypes;
+    selected.delete(value);
+    const btn = which === 'company'
+      ? document.getElementById('srcCompanyBtn')
+      : document.getElementById('srcTypeBtn');
+    btn.classList.toggle('has-filter', selected.size > 0);
+    buildSrcDropdown(which);
+    renderSrcChips();
+    renderSrcTable();
+  }
+
+  function renderSrcChips() {
+    const el = document.getElementById('srcChips');
+    const chips = [];
+    srcSelectedCompanies.forEach(c => {
+      chips.push(`<span class="data-filter-chip">${c} <span class="chip-x" onclick="event.stopPropagation();removeSrcFilter('company','${c.replace(/'/g, "\\'")}')">&times;</span></span>`);
+    });
+    srcSelectedTypes.forEach(t => {
+      chips.push(`<span class="data-filter-chip">${t} <span class="chip-x" onclick="event.stopPropagation();removeSrcFilter('type','${t.replace(/'/g, "\\'")}')">&times;</span></span>`);
+    });
+    el.innerHTML = chips.join('');
+  }
+
+  function renderSrcTable() {
+    let docs = getSrcAllDocs();
+    const searchText = (document.getElementById('srcSearch')?.value || '').toLowerCase();
+
+    // Apply company filter
+    if (srcSelectedCompanies.size > 0) {
+      docs = docs.filter(d => srcSelectedCompanies.has(d.company));
+    }
+    // Apply type filter
+    if (srcSelectedTypes.size > 0) {
+      docs = docs.filter(d => srcSelectedTypes.has(d.type));
+    }
+    // Apply search
+    if (searchText) {
+      docs = docs.filter(d =>
+        d.title.toLowerCase().includes(searchText) ||
+        d.company.toLowerCase().includes(searchText) ||
+        d.type.toLowerCase().includes(searchText));
+    }
+
+    document.getElementById('srcDocCount').textContent = `${docs.length} Documents`;
+
+    const tbody = document.getElementById('srcTableBody');
+    tbody.innerHTML = docs.map(d => {
+      const docId = `${d.company}::${d.title}`;
+      const isActive = srcSelectedDocs.includes(docId);
+      return `<tr>
+        <td class="src-company">${d.company}</td>
+        <td>${d.title}</td>
+        <td class="src-type">${d.type}</td>
+        <td>${d.pubDate}</td>
+        <td>${d.avail}</td>
+        <td class="src-series">${d.series}</td>
+        <td><button class="series-toggle${isActive ? ' active' : ''}"
+             data-id="${docId.replace(/"/g, '&quot;')}"
+             onclick="toggleSrcDoc(this)"></button></td>
+      </tr>`;
+    }).join('');
+
+    updateSrcSelectAllState();
+    updateSrcDlCount();
+  }
+
+  function toggleSrcDoc(btn) {
+    const id = btn.dataset.id;
+    if (btn.classList.contains('active')) {
+      btn.classList.remove('active');
+      srcSelectedDocs = srcSelectedDocs.filter(d => d !== id);
+    } else {
+      btn.classList.add('active');
+      if (!srcSelectedDocs.includes(id)) srcSelectedDocs.push(id);
+    }
+    updateSrcDlCount();
+    updateSrcSelectAllState();
+  }
+
+  function updateSrcDlCount() {
+    document.getElementById('srcDlCount').textContent = srcSelectedDocs.length;
+  }
+
+  function toggleSrcSelectAll() {
+    const toggles = document.querySelectorAll('#srcTableBody .series-toggle');
+    if (toggles.length === 0) return;
+    const allActive = Array.from(toggles).every(t => t.classList.contains('active'));
+    toggles.forEach(btn => {
+      const id = btn.dataset.id;
+      if (allActive) {
+        btn.classList.remove('active');
+        srcSelectedDocs = srcSelectedDocs.filter(d => d !== id);
+      } else if (!btn.classList.contains('active')) {
+        btn.classList.add('active');
+        if (!srcSelectedDocs.includes(id)) srcSelectedDocs.push(id);
+      }
+    });
+    updateSrcDlCount();
+    updateSrcSelectAllState();
+  }
+
+  function updateSrcSelectAllState() {
+    const btn = document.getElementById('srcSelectAllBtn');
+    if (!btn) return;
+    const toggles = document.querySelectorAll('#srcTableBody .series-toggle');
+    if (toggles.length === 0) {
+      btn.textContent = 'Select All';
+      btn.classList.remove('all-selected');
+      return;
+    }
+    const allActive = Array.from(toggles).every(t => t.classList.contains('active'));
+    btn.textContent = allActive ? 'Unselect All' : 'Select All';
+    btn.classList.toggle('all-selected', allActive);
+  }
+
+  function downloadSrcSelected() {
+    alert('DEMO - No Data Download');
+  }
+
+  // ===== Hash-based deep linking (for new-tab opens) =====
+  (function() {
+    const hash = window.location.hash;
+    if (!hash) return;
+    const params = new URLSearchParams(hash.slice(1));
+    const tab = params.get('tab');
+    if (tab === 'DATA') {
+      const asset = params.get('asset');
+      const series = params.get('series');
+      setTimeout(() => {
+        const opts = {};
+        if (asset) opts.asset = asset;
+        if (series) opts.series = series.split(',');
+        openRelatedData(opts);
+      }, 100);
+    } else if (tab === 'SOURCES') {
+      const company = params.get('company');
+      const types = params.get('types');
+      setTimeout(() => {
+        const opts = {};
+        if (company) opts.company = company;
+        if (types) opts.types = types.split(',').filter(Boolean);
+        openRelatedSources(opts);
+      }, 100);
+    }
+    // Clean hash so it doesn't persist on refresh
+    history.replaceState(null, '', window.location.pathname);
+  })();
+</script>
+
+</body>
+</html>
