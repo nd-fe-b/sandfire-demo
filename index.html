@@ -708,7 +708,7 @@ function unlock(){
 </script>
 <div id="content" style="display:none;">
 
-<div class="demo-banner"><strong>Interactive Demo</strong> — Sample data shown for illustration purposes. Not connected to live systems.</div>
+<div class="demo-banner"><strong>Interactive Demo</strong> — Placeholder data shown for illustration purposes. Not connected to live systems.</div>
 
 <!-- Top bar -->
 <div class="topbar">
@@ -732,7 +732,7 @@ function unlock(){
 
   <!-- ========== LANDING (all assets) ========== -->
   <div class="landing" id="landing">
-    <div class="landing-slogan"><h1>Mining analysis — straight from the source</h1><div class="subtitle">Select an asset and ask me anything</div></div>
+    <div class="landing-slogan"><h1>Mining analysis — straight from the source</h1><div class="subtitle">Ask me anything</div></div>
     <div class="select-asset-wrapper">
       <input class="select-asset-bar" id="assetSearch" type="text"
              placeholder="Select an asset"
@@ -772,29 +772,6 @@ function unlock(){
       </div>
     </div>
 
-    <div class="recent-section">
-      <h3>Recent Conversations</h3>
-      <div class="recent-item" onclick="openChatFromLanding('escondida-1')">
-        <div class="ri-title">Escondida production impacts over 5 years</div>
-        <div class="ri-asset">Escondida</div>
-        <div class="ri-time">2h ago</div>
-      </div>
-      <div class="recent-item" onclick="openChatFromLanding('escondida-2')">
-        <div class="ri-title">Grade decline and recovery rate correlation</div>
-        <div class="ri-asset">Escondida</div>
-        <div class="ri-time">Yesterday</div>
-      </div>
-      <div class="recent-item" onclick="openChatFromLanding('chapada-1')">
-        <div class="ri-title">Chapada C1 cost spike analysis</div>
-        <div class="ri-asset">Chapada</div>
-        <div class="ri-time">Feb 25</div>
-      </div>
-      <div class="recent-item" onclick="openChatFromLanding('chapada-2')">
-        <div class="ri-title">Chapada electricity cost breakdown</div>
-        <div class="ri-asset">Chapada</div>
-        <div class="ri-time">Feb 20</div>
-      </div>
-    </div>
     <div class="landing-copyright">&copy; AlfaRev 2026</div>
   </div>
 
@@ -864,10 +841,10 @@ function unlock(){
           </div>
           <div class="followup">Do you want me to export this timeline as a csv?</div>
           <div class="response-actions">
-            <span class="response-action" onmouseenter="showActionPreview(event, 'data', {asset:'Escondida', series:['Ore Mined','Ore Milled','Contained Metal','Recovery Rate','Head Grade']})">
+            <span class="response-action" onclick="showActionPreview(event, 'data', {asset:'Escondida', series:['Ore Mined','Ore Milled','Contained Metal','Recovery Rate','Head Grade']})">
               <span class="action-icon">&#8599;</span> Data <span class="action-count">5</span>
             </span>
-            <span class="response-action" onmouseenter="showActionPreview(event, 'sources', {company:'BHP Group', types:['Annual Report','Operational Review']})">
+            <span class="response-action" onclick="showActionPreview(event, 'sources', {company:'BHP Group', types:['Annual Report','Operational Review']})">
               <span class="action-icon">&#8599;</span> Sources <span class="action-count">4</span>
             </span>
           </div>
@@ -906,10 +883,10 @@ function unlock(){
           </div>
           <div class="followup">Do you want me to plot grade vs recovery over the full time series?</div>
           <div class="response-actions">
-            <span class="response-action" onmouseenter="showActionPreview(event, 'data', {asset:'Escondida', series:['Head Grade','Recovery Rate']})">
+            <span class="response-action" onclick="showActionPreview(event, 'data', {asset:'Escondida', series:['Head Grade','Recovery Rate']})">
               <span class="action-icon">&#8599;</span> Data <span class="action-count">2</span>
             </span>
-            <span class="response-action" onmouseenter="showActionPreview(event, 'sources', {company:'BHP Group', types:['Annual Report','Technical Report']})">
+            <span class="response-action" onclick="showActionPreview(event, 'sources', {company:'BHP Group', types:['Annual Report','Technical Report']})">
               <span class="action-icon">&#8599;</span> Sources <span class="action-count">3</span>
             </span>
           </div>
@@ -951,10 +928,10 @@ function unlock(){
           </div>
           <div class="followup">Do you want me to compare Chapada's C1 trend against Caserones and Neves-Corvo?</div>
           <div class="response-actions">
-            <span class="response-action" onmouseenter="showActionPreview(event, 'data', {asset:'Chapada', series:['C1 Cash Cost','AISC','By-Product Credits','Revenue']})">
+            <span class="response-action" onclick="showActionPreview(event, 'data', {asset:'Chapada', series:['C1 Cash Cost','AISC','By-Product Credits','Revenue']})">
               <span class="action-icon">&#8599;</span> Data <span class="action-count">4</span>
             </span>
-            <span class="response-action" onmouseenter="showActionPreview(event, 'sources', {company:'Lundin Mining', types:['Annual Report','Quarterly Report']})">
+            <span class="response-action" onclick="showActionPreview(event, 'sources', {company:'Lundin Mining', types:['Annual Report','Quarterly Report']})">
               <span class="action-icon">&#8599;</span> Sources <span class="action-count">6</span>
             </span>
           </div>
@@ -993,10 +970,10 @@ function unlock(){
           </div>
           <div class="followup">Do you want me to pull Lundin's energy hedging disclosures?</div>
           <div class="response-actions">
-            <span class="response-action" onmouseenter="showActionPreview(event, 'data', {asset:'Chapada', series:['C1 Cash Cost','AISC']})">
+            <span class="response-action" onclick="showActionPreview(event, 'data', {asset:'Chapada', series:['C1 Cash Cost','AISC']})">
               <span class="action-icon">&#8599;</span> Data <span class="action-count">2</span>
             </span>
-            <span class="response-action" onmouseenter="showActionPreview(event, 'sources', {company:'Lundin Mining', types:['Annual Report','Technical Report','Investor Presentation']})">
+            <span class="response-action" onclick="showActionPreview(event, 'sources', {company:'Lundin Mining', types:['Annual Report','Technical Report','Investor Presentation']})">
               <span class="action-icon">&#8599;</span> Sources <span class="action-count">5</span>
             </span>
           </div>
@@ -1445,27 +1422,15 @@ function unlock(){
       alert(type === 'data' ? 'DEMO — Open Data' : 'DEMO — Open Sources');
     };
 
-    // Close on mouse leave from the whole zone (actions + preview)
-    const msgEl = actionsBar.closest('.msg.ai');
-    const onLeave = (e) => {
-      const related = e.relatedTarget;
-      if (related && (msgEl.contains(related))) return;
-      preview.remove();
-      msgEl.removeEventListener('mouseleave', onLeave);
-    };
-    msgEl.addEventListener('mouseleave', onLeave);
-
-    // Also close if hovering the other button
-    actionsBar.querySelectorAll('.response-action').forEach(btn => {
-      btn.addEventListener('mouseleave', () => {
-        // Small delay so moving to the preview doesn't instantly close
-        setTimeout(() => {
-          if (!preview.matches(':hover') && !actionsBar.matches(':hover')) {
-            preview.remove();
-          }
-        }, 150);
-      }, { once: true });
-    });
+    // Close on click outside
+    setTimeout(() => {
+      document.addEventListener('click', function closePreview(e) {
+        if (!preview.contains(e.target) && !actionsBar.contains(e.target)) {
+          preview.remove();
+          document.removeEventListener('click', closePreview);
+        }
+      });
+    }, 0);
 
     // Scroll into view
     setTimeout(() => preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
@@ -1554,10 +1519,10 @@ function unlock(){
     const sourceTypes = Object.entries(typeCounts).sort((a,b) => b[1] - a[1]).slice(0, 2).map(e => e[0]);
     const sourceCount = companyDocs.filter(d => sourceTypes.includes(d.type)).length;
     html += `<div class="response-actions">
-      <span class="response-action" onmouseenter="showActionPreview(event, 'data', {asset:'${assetName}', series:${JSON.stringify(dataSeries)}})">
+      <span class="response-action" onclick="showActionPreview(event, 'data', {asset:'${assetName}', series:${JSON.stringify(dataSeries)}})">
         <span class="action-icon">&#8599;</span> Data <span class="action-count">${dataSeries.length}</span>
       </span>
-      <span class="response-action" onmouseenter="showActionPreview(event, 'sources', {company:'${company}', types:${JSON.stringify(sourceTypes)}})">
+      <span class="response-action" onclick="showActionPreview(event, 'sources', {company:'${company}', types:${JSON.stringify(sourceTypes)}})">
         <span class="action-icon">&#8599;</span> Sources <span class="action-count">${sourceCount}</span>
       </span>
     </div>`;
