@@ -47,9 +47,8 @@
   .topbar .user .avatar {
     width: 36px; height: 36px; border-radius: 50%;
     overflow: hidden; flex-shrink: 0;
-  }
-  .topbar .user .avatar img {
-    width: 100%; height: 100%; object-fit: cover;
+    background: #6c49b6; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: #fff;
   }
 
   /* Main */
@@ -735,7 +734,7 @@ function checkGate(){
 </script>
 
 <div id="content" style="display:none;">
-<div class="demo-banner"><strong>Interactive Demo</strong> — Placeholder data shown for illustration purposes. Not connected to live systems.</div>
+<div class="demo-banner"><strong>Interactive Demo</strong> — Placeholder data shown for illustration purposes.</div>
 
 <!-- Top bar -->
 <div class="topbar">
@@ -750,7 +749,7 @@ function checkGate(){
       <div style="color: #ccc; font-weight: 500;">John Doe</div>
       <div>Sandfire Resources</div>
     </div>
-    <div class="avatar"><img src="assets/img/avatar.jpeg" alt="JD"></div>
+    <div class="avatar">JD</div>
   </div>
 </div>
 
